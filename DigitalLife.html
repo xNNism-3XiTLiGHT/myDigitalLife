@@ -1,0 +1,2927 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+ <meta charset="UTF-8" />
+ <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+ <title>Program-Übersicht</title>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+ <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+ <style>
+ :root {
+ --bg: #1e1e1e;
+ --surface: #2a2a2a;
+ --surface2: #333333;
+ --border: #444444;
+ --accent: #e03030;
+ --accent2: #ffffff;
+ --text: #f0f0f0;
+ --muted: #999999;
+ --danger: #ff4444;
+ --tag-bg: #3a1a1a;
+ --radius: 6px;
+ }
+ *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+ body { font-family: 'IBM Plex Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+
+ /* ── OS SWITCHER (top bar) ── */
+ .os-switcher {
+ background: #111111;
+ border-bottom: 2px solid var(--border);
+ display: flex;
+ align-items: center;
+ padding: 0 0 0 0;
+ flex-shrink: 0;
+ position: sticky;
+ top: 0;
+ z-index: 200;
+ }
+ .os-switch-btn {
+ flex: 1;
+ font-family: 'IBM Plex Mono', monospace;
+ font-size: 0.88rem;
+ font-weight: 600;
+ color: var(--muted);
+ background: none;
+ border: none;
+ border-bottom: 3px solid transparent;
+ padding: 13px 0;
+ cursor: pointer;
+ display: flex;
+ align-items: center;
+ justify-content: center;
+ gap: 8px;
+ transition: color 0.15s, background 0.15s, border-color 0.15s;
+ user-select: none;
+ letter-spacing: 0.03em;
+ }
+ .os-switch-btn:hover { background: #1a1a1a; color: var(--text); }
+ .os-switch-btn.active { color: var(--accent2); border-bottom-color: var(--accent); background: #181818; }
+ .os-switch-btn .os-icon { font-size: 1.1rem; }
+ .os-divider { width: 1px; background: var(--border); height: 40px; flex-shrink: 0; }
+
+ /* ── HEADER ── */
+ header {
+ background: var(--surface);
+ border-bottom: 1px solid var(--border);
+ padding: 12px 28px;
+ display: flex;
+ align-items: center;
+ justify-content: space-between;
+ flex-shrink: 0;
+ }
+ .header-os-label {
+ font-family: 'IBM Plex Mono', monospace;
+ font-size: 0.72rem;
+ color: var(--accent);
+ letter-spacing: 0.1em;
+ text-transform: uppercase;
+ }
+ .header-right { display: flex; align-items: center; gap: 10px; }
+ #searchInput {
+ background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+ color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+ padding: 6px 13px; width: 200px; outline: none; transition: border-color 0.2s;
+ }
+ #searchInput::placeholder { color: var(--muted); }
+ #searchInput:focus { border-color: var(--accent); }
+
+ /* ── TAB BAR ── */
+ .tab-bar {
+ background: var(--surface); border-bottom: 1px solid var(--border);
+ display: flex; padding: 0 28px; flex-shrink: 0;
+ }
+ .tab {
+ font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; font-weight: 600;
+ color: var(--muted); padding: 9px 18px; cursor: pointer;
+ border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+ user-select: none;
+ }
+ .tab:hover { color: var(--text); }
+ .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+ /* ── PAGES ── */
+ .page { display: none; flex: 1; }
+ .page.active { display: flex; flex-direction: column; }
+
+ /* ── BUTTONS ── */
+ .btn {
+ font-family: 'IBM Plex Sans', sans-serif; font-size: 0.82rem; font-weight: 600;
+ border: none; border-radius: var(--radius); cursor: pointer; padding: 8px 16px; transition: all 0.18s;
+ }
+ .btn-primary { background: var(--accent); color: #fff; }
+ .btn-primary:hover { background: #c02020; }
+ .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+ .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+ .btn-sm { padding: 6px 12px; font-size: 0.78rem; }
+
+ /* ════ ALLE PROGRAMME ════ */
+ #pageAll { padding: 24px 28px 60px; max-width: 1200px; width: 100%; margin: 0 auto; align-self: center; }
+ .toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+ .count-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--muted); }
+ .count-badge strong { color: var(--accent2); }
+ #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 14px; }
+
+ .card {
+ background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+ padding: 17px; display: flex; flex-direction: column; gap: 8px;
+ transition: border-color 0.2s, transform 0.15s; animation: fadeIn 0.2s ease;
+ }
+ .card:hover { border-color: var(--accent); transform: translateY(-2px); }
+ @keyframes fadeIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:translateY(0); } }
+
+ .card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+ .card-name { font-weight: 600; font-size: 0.95rem; color: var(--text); word-break: break-word; }
+ .card-actions { display: flex; gap: 4px; flex-shrink: 0; }
+ .icon-btn { background: none; border: none; cursor: pointer; color: var(--muted); padding: 2px 4px; border-radius: 4px; font-size: 0.82rem; transition: color 0.15s; }
+ .icon-btn:hover { color: var(--text); }
+ .icon-btn.del:hover { color: var(--danger); }
+ .card-link a { font-family: 'IBM Plex Mono', monospace; font-size: 0.71rem; color: var(--accent); text-decoration: none; word-break: break-all; }
+ .card-link a:hover { text-decoration: underline; }
+ .card-comment { font-size: 0.81rem; color: var(--muted); line-height: 1.5; border-left: 2px solid var(--border); padding-left: 10px; }
+ .card-tag {
+ display: inline-block; background: var(--tag-bg); color: var(--accent2);
+ font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem;
+ padding: 2px 8px; border-radius: 20px; border: 1px solid #5a1a1a;
+ cursor: pointer; transition: background 0.15s;
+ }
+ .card-tag:hover { background: #4a1a1a; }
+ .card-ps { background: #181818; border: 1px solid #3a1a1a; border-left: 3px solid #e03030; border-radius: 5px; padding: 9px 12px; position: relative; }
+ .card-ps-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: #e03030; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px; }
+ .card-ps code { font-family: 'IBM Plex Mono', monospace; font-size: 0.73rem; color: #fff; white-space: pre-wrap; word-break: break-all; display: block; }
+ .copy-btn {
+ position: absolute; top: 6px; right: 7px;
+ background: #2a1a1a; border: 1px solid #3a1a1a; border-radius: 4px;
+ color: #e03030; font-size: 0.66rem; cursor: pointer; padding: 2px 6px;
+ font-family: 'IBM Plex Mono', monospace; transition: background 0.15s;
+ }
+ .copy-btn:hover { background: #3a1a1a; }
+ .copy-btn.copied { color: #fff; }
+ .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); display: none; }
+ .empty-state .emoji { font-size: 2rem; margin-bottom: 10px; }
+ .empty-state p { font-size: 0.86rem; }
+
+ /* ════ KATEGORIEN ════ */
+ #pageCat { flex-direction: row; overflow: hidden; height: calc(100vh - 116px); }
+ .cat-sidebar { width: 260px; flex-shrink: 0; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; }
+ .cat-sidebar-header { padding: 14px 15px 11px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+ .cat-sidebar-header h2 { font-family: 'IBM Plex Mono', monospace; font-size: 0.73rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+ .cat-list { flex: 1; overflow-y: auto; padding: 6px; }
+ .cat-item { display: flex; align-items: center; gap: 6px; padding: 8px 9px; border-radius: 6px; cursor: pointer; transition: background 0.15s; border: 1px solid transparent; margin-bottom: 2px; }
+ .cat-item:hover { background: var(--surface2); }
+ .cat-item.selected { background: var(--tag-bg); border-color: #5a1a1a; }
+ .cat-item-name { flex: 1; font-size: 0.83rem; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+ .cat-item.selected .cat-item-name { color: var(--accent2); font-weight: 600; }
+ .cat-item-count { font-family: 'IBM Plex Mono', monospace; font-size: 0.66rem; color: var(--muted); background: var(--surface2); padding: 1px 7px; border-radius: 20px; flex-shrink: 0; }
+ .cat-item.selected .cat-item-count { background: #4a1a1a; color: var(--accent2); }
+ .cat-item-btns { display: none; gap: 2px; flex-shrink: 0; }
+ .cat-item:hover .cat-item-btns, .cat-item.selected .cat-item-btns { display: flex; }
+ .cat-btn { background: none; border: none; cursor: pointer; color: var(--muted); padding: 2px 4px; font-size: 0.73rem; border-radius: 3px; transition: color 0.15s; }
+ .cat-btn:hover { color: var(--text); }
+ .cat-btn.del:hover { color: var(--danger); }
+ .cat-rename-input { flex: 1; background: var(--surface2); border: 1px solid var(--accent); border-radius: 4px; color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.82rem; padding: 3px 7px; outline: none; }
+ .cat-new-row { padding: 9px 7px; border-top: 1px solid var(--border); flex-shrink: 0; display: flex; gap: 6px; }
+ .cat-new-row input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.81rem; padding: 6px 9px; outline: none; transition: border-color 0.2s; }
+ .cat-new-row input:focus { border-color: var(--accent); }
+ .cat-new-row input::placeholder { color: var(--muted); }
+ .cat-content { flex: 1; overflow-y: auto; padding: 22px 26px 60px; }
+ .cat-content-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+ .cat-content-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.98rem; color: var(--accent2); }
+ .cat-content-title span { color: var(--accent); margin-right: 6px; }
+ .app-row { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 13px 15px; margin-bottom: 9px; display: flex; align-items: flex-start; gap: 12px; transition: border-color 0.2s; animation: fadeIn 0.2s ease; }
+ .app-row:hover { border-color: var(--accent); }
+ .app-row-info { flex: 1; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+ .app-row-name { font-weight: 600; font-size: 0.9rem; color: var(--text); }
+ .app-row-link a { font-family: 'IBM Plex Mono', monospace; font-size: 0.69rem; color: var(--accent); text-decoration: none; word-break: break-all; }
+ .app-row-link a:hover { text-decoration: underline; }
+ .app-row-comment { font-size: 0.79rem; color: var(--muted); line-height: 1.4; }
+ .app-row-ps { background: #181818; border: 1px solid #3a1a1a; border-left: 3px solid #e03030; border-radius: 4px; padding: 6px 38px 6px 10px; font-family: 'IBM Plex Mono', monospace; font-size: 0.71rem; color: #fff; white-space: pre-wrap; word-break: break-all; position: relative; }
+ .app-row-ps .copy-btn { top: 4px; right: 5px; padding: 1px 5px; font-size: 0.63rem; }
+ .app-row-actions { display: flex; gap: 4px; flex-shrink: 0; margin-top: 1px; }
+ .cat-placeholder { text-align: center; padding: 60px 20px; color: var(--muted); font-size: 0.86rem; }
+ .cat-placeholder .emoji { font-size: 2rem; margin-bottom: 10px; }
+
+ /* ════ SETUP TODO ════ */
+ #pageTodo { overflow: hidden; height: calc(100vh - 116px); }
+ .todo-os-content { padding: 24px 28px 80px; max-width: 860px; width: 100%; margin: 0 auto; overflow-y: auto; height: 100%; display: flex; flex-direction: column; }
+ .todo-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+ .todo-title { font-family: 'IBM Plex Mono', monospace; font-size: 0.98rem; color: var(--accent2); }
+ .todo-title span { color: var(--accent); margin-right: 6px; }
+ .todo-header-actions { display: flex; gap: 8px; }
+ .todo-progress-bar-wrap { background: var(--surface2); border-radius: 20px; height: 5px; margin-bottom: 20px; overflow: hidden; }
+ .todo-progress-bar-fill { height: 100%; background: var(--accent); border-radius: 20px; transition: width 0.3s ease; }
+ .todo-progress-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.71rem; color: var(--muted); margin-bottom: 7px; display: flex; justify-content: space-between; }
+ .todo-progress-label strong { color: var(--accent2); }
+ .todo-section { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; margin-bottom: 12px; overflow: hidden; animation: fadeIn 0.2s ease; }
+ .todo-section-header { display: flex; align-items: center; gap: 9px; padding: 12px 14px; cursor: pointer; border-bottom: 1px solid transparent; transition: background 0.15s; user-select: none; }
+ .todo-section-header:hover { background: var(--surface2); }
+ .todo-section.open .todo-section-header { border-bottom-color: var(--border); }
+ .todo-section-chevron { font-size: 0.68rem; color: var(--muted); transition: transform 0.2s; flex-shrink: 0; }
+ .todo-section.open .todo-section-chevron { transform: rotate(90deg); }
+ .todo-section-title { flex: 1; font-weight: 600; font-size: 0.88rem; color: var(--text); }
+ .todo-section-prog { font-family: 'IBM Plex Mono', monospace; font-size: 0.69rem; color: var(--muted); flex-shrink: 0; }
+ .todo-section-prog.done { color: #4caf50; }
+ .todo-section-mini-bar { width: 55px; height: 4px; background: var(--surface2); border-radius: 10px; overflow: hidden; flex-shrink: 0; }
+ .todo-section-mini-fill { height: 100%; background: var(--accent); border-radius: 10px; transition: width 0.3s; }
+ .todo-section-mini-fill.done { background: #4caf50; }
+ .todo-section-actions { display: flex; gap: 2px; flex-shrink: 0; }
+ .todo-items { padding: 5px 7px 7px; }
+ .todo-item { display: flex; align-items: flex-start; gap: 9px; padding: 8px 9px; border-radius: 6px; transition: background 0.12s; }
+ .todo-item:hover { background: var(--surface2); }
+ .todo-item:hover .todo-item-actions { opacity: 1; }
+ .todo-checkbox { width: 16px; height: 16px; flex-shrink: 0; margin-top: 2px; accent-color: var(--accent); cursor: pointer; }
+ .todo-item-body { flex: 1; min-width: 0; }
+ .todo-item-label { font-size: 0.86rem; color: var(--text); line-height: 1.4; transition: color 0.15s; }
+ .todo-item.checked .todo-item-label { color: var(--muted); text-decoration: line-through; }
+ .todo-item-note { font-size: 0.74rem; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+ .todo-item-ps { margin-top: 5px; background: #181818; border: 1px solid #3a1a1a; border-left: 3px solid #e03030; border-radius: 4px; padding: 5px 36px 5px 9px; font-family: 'IBM Plex Mono', monospace; font-size: 0.69rem; color: #fff; white-space: pre-wrap; word-break: break-all; position: relative; }
+ .todo-item-ps .copy-btn { top: 3px; right: 5px; padding: 1px 5px; font-size: 0.63rem; }
+ .todo-item-actions { display: flex; gap: 2px; flex-shrink: 0; opacity: 0; transition: opacity 0.15s; margin-top: 1px; }
+ .todo-add-row { display: flex; gap: 6px; padding: 5px 9px 9px; }
+ .todo-add-row input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.81rem; padding: 6px 9px; outline: none; transition: border-color 0.2s; }
+ .todo-add-row input:focus { border-color: var(--accent); }
+ .todo-add-row input::placeholder { color: var(--muted); }
+ .todo-add-section { display: flex; gap: 8px; margin-top: 4px; }
+ .todo-add-section input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.84rem; padding: 7px 11px; outline: none; transition: border-color 0.2s; }
+ .todo-add-section input:focus { border-color: var(--accent); }
+ .todo-add-section input::placeholder { color: var(--muted); }
+
+ /* ── MODAL ── */
+ .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.72); backdrop-filter: blur(3px); z-index: 300; align-items: center; justify-content: center; }
+ .overlay.open { display: flex; }
+ .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 24px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; animation: slideUp 0.2s ease; }
+ @keyframes slideUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:translateY(0); } }
+ .modal h2 { font-family: 'IBM Plex Mono', monospace; font-size: 0.91rem; color: var(--accent); margin-bottom: 16px; }
+ .field { margin-bottom: 13px; }
+ .field label { display: block; font-size: 0.71rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 5px; }
+ .field input, .field textarea { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.86rem; padding: 8px 10px; outline: none; transition: border-color 0.2s; }
+ .field input:focus, .field textarea:focus { border-color: var(--accent); }
+ .field textarea { resize: vertical; min-height: 72px; }
+ .modal-footer { display: flex; justify-content: flex-end; gap: 9px; margin-top: 18px; }
+
+ /* ── Entry Icons ── */
+ .card-icon { width: 36px; height: 36px; border-radius: 8px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--surface2); }
+ .card-icon-placeholder { width: 36px; height: 36px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+ .card-header-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+ .app-row-icon { width: 30px; height: 30px; border-radius: 6px; object-fit: cover; flex-shrink: 0; border: 1px solid var(--border); background: var(--surface2); }
+ .app-row-icon-placeholder { width: 30px; height: 30px; border-radius: 6px; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.95rem; flex-shrink: 0; }
+
+ /* Icon upload field */
+ .icon-field { display: flex; gap: 8px; align-items: flex-start; }
+ .icon-preview-wrap { flex-shrink: 0; width: 52px; height: 52px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); display: flex; align-items: center; justify-content: center; overflow: hidden; cursor: pointer; position: relative; transition: border-color 0.2s; }
+ .icon-preview-wrap:hover { border-color: var(--accent); }
+ .icon-preview-wrap img { width: 100%; height: 100%; object-fit: cover; }
+ .icon-preview-wrap .icon-preview-emoji { font-size: 1.5rem; }
+ .icon-preview-wrap .icon-clear { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.6); align-items: center; justify-content: center; color: var(--danger); font-size: 1rem; cursor: pointer; }
+ .icon-preview-wrap:hover .icon-clear { display: flex; }
+ .icon-inputs { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+ .icon-inputs input[type=text] { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem; padding: 7px 10px; outline: none; transition: border-color 0.2s; }
+ .icon-inputs input[type=text]:focus { border-color: var(--accent); }
+ .icon-inputs input[type=text]::placeholder { color: var(--muted); }
+ .icon-upload-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--muted); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.78rem; padding: 7px 10px; cursor: pointer; transition: border-color 0.2s, color 0.2s; text-align: center; }
+ .icon-upload-btn:hover { border-color: var(--accent); color: var(--accent); }
+ #fIconFile { display: none; }
+
+ /* ════ DATEIEN ════ */
+ #pageFiles { padding: 24px 28px 60px; max-width: 1100px; width: 100%; margin: 0 auto; align-self: center; overflow-y: auto; }
+
+ .files-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; gap: 12px; flex-wrap: wrap; }
+ .files-toolbar-left { display: flex; align-items: center; gap: 10px; }
+ .files-view-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--muted); font-size: 0.82rem; padding: 5px 10px; cursor: pointer; transition: all 0.15s; }
+ .files-view-btn.active, .files-view-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--tag-bg); }
+
+ /* File type filter pills */
+ .file-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+ .filter-pill { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--surface2); cursor: pointer; transition: all 0.15s; user-select: none; }
+ .filter-pill:hover { border-color: var(--accent); color: var(--accent); }
+ .filter-pill.active { background: var(--tag-bg); border-color: var(--accent); color: var(--accent2); }
+
+ /* Grid view */
+ #filesGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+
+ .file-card {
+ background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+ padding: 16px 14px 14px; display: flex; flex-direction: column; align-items: center;
+ gap: 8px; text-align: center; transition: border-color 0.2s, transform 0.15s;
+ animation: fadeIn 0.2s ease; cursor: default; position: relative;
+ }
+ .file-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+ .file-card:hover .file-card-actions { opacity: 1; }
+
+ .file-type-icon { font-size: 2.2rem; line-height: 1; }
+ .file-thumb { width: 52px; height: 52px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); }
+ .file-card-name { font-size: 0.82rem; font-weight: 600; color: var(--text); word-break: break-word; line-height: 1.3; }
+ .file-card-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); }
+ .file-card-path { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: var(--accent); word-break: break-all; line-height: 1.3; }
+ .file-card-tag { display: inline-block; background: var(--tag-bg); color: var(--accent2); font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; padding: 1px 7px; border-radius: 20px; border: 1px solid #5a1a1a; }
+ .file-card-desc { font-size: 0.75rem; color: var(--muted); line-height: 1.4; }
+
+ .file-card-actions { position: absolute; top: 7px; right: 7px; display: flex; gap: 3px; opacity: 0; transition: opacity 0.15s; }
+ .file-card-btns-bottom { display: flex; gap: 5px; margin-top: 4px; }
+ .file-action-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; color: var(--muted); font-size: 0.7rem; padding: 4px 8px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; white-space: nowrap; }
+ .file-action-btn:hover { border-color: var(--accent); color: var(--accent); }
+ .file-action-btn.copied { color: #4caf50; border-color: #4caf50; }
+
+ /* List view */
+ #filesList { display: flex; flex-direction: column; gap: 8px; }
+ .file-row {
+ background: var(--surface); border: 1px solid var(--border); border-radius: 7px;
+ padding: 11px 14px; display: flex; align-items: center; gap: 12px;
+ transition: border-color 0.2s; animation: fadeIn 0.2s ease;
+ }
+ .file-row:hover { border-color: var(--accent); }
+ .file-row-icon { font-size: 1.5rem; flex-shrink: 0; width: 32px; text-align: center; }
+ .file-row-thumb { width: 32px; height: 32px; object-fit: cover; border-radius: 5px; border: 1px solid var(--border); flex-shrink: 0; }
+ .file-row-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+ .file-row-name { font-weight: 600; font-size: 0.88rem; color: var(--text); }
+ .file-row-path { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+ .file-row-desc { font-size: 0.77rem; color: var(--muted); }
+ .file-row-tag { display: inline-block; background: var(--tag-bg); color: var(--accent2); font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; padding: 1px 7px; border-radius: 20px; border: 1px solid #5a1a1a; }
+ .file-row-actions { display: flex; gap: 5px; flex-shrink: 0; align-items: center; }
+
+ /* Upload drop zone inside modal */
+ .drop-zone {
+ border: 2px dashed var(--border); border-radius: var(--radius); padding: 18px;
+ text-align: center; color: var(--muted); font-size: 0.81rem; cursor: pointer;
+ transition: border-color 0.2s, background 0.2s; margin-bottom: 4px;
+ }
+ .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: var(--tag-bg); color: var(--accent2); }
+ .drop-zone-icon { font-size: 1.6rem; margin-bottom: 5px; }
+
+ /* ════ WIKI ════ */
+ #pageWiki { flex-direction: row; overflow: hidden; height: calc(100vh - 116px); }
+
+ /* Sidebar */
+ .wiki-sidebar {
+ width: 260px; flex-shrink: 0; background: var(--surface);
+ border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden;
+ }
+ .wiki-sidebar-header {
+ padding: 12px 14px 10px; border-bottom: 1px solid var(--border);
+ flex-shrink: 0; display: flex; align-items: center; justify-content: space-between;
+ }
+ .wiki-sidebar-header h2 { font-family: 'IBM Plex Mono', monospace; font-size: 0.73rem; color: var(--accent); text-transform: uppercase; letter-spacing: 0.1em; }
+ .wiki-search { padding: 8px 10px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+ .wiki-search input { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 0.8rem; padding: 6px 9px; outline: none; transition: border-color 0.2s; }
+ .wiki-search input:focus { border-color: var(--accent); }
+ .wiki-search input::placeholder { color: var(--muted); }
+
+ .wiki-page-list { flex: 1; overflow-y: auto; padding: 5px; }
+ .wiki-page-item {
+ padding: 9px 10px; border-radius: 6px; cursor: pointer; border: 1px solid transparent;
+ margin-bottom: 2px; transition: background 0.15s; display: flex; align-items: flex-start; gap: 8px;
+ }
+ .wiki-page-item:hover { background: var(--surface2); }
+ .wiki-page-item.active { background: var(--tag-bg); border-color: #5a1a1a; }
+ .wiki-page-item-body { flex: 1; min-width: 0; }
+ .wiki-page-item-title { font-size: 0.84rem; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+ .wiki-page-item.active .wiki-page-item-title { color: var(--accent2); }
+ .wiki-page-item-preview { font-size: 0.71rem; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
+ .wiki-page-item-tag { display: inline-block; background: var(--tag-bg); color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 0.58rem; padding: 1px 6px; border-radius: 10px; border: 1px solid #3a1a1a; margin-top: 3px; }
+ .wiki-page-item.active .wiki-page-item-tag { color: var(--accent2); }
+ .wiki-page-item-date { font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; color: var(--muted); flex-shrink: 0; margin-top: 2px; }
+
+ .wiki-new-btn { padding: 10px 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
+
+ /* Content area */
+ .wiki-content { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+
+ .wiki-content-toolbar {
+ background: var(--surface); border-bottom: 1px solid var(--border);
+ padding: 10px 20px; display: flex; align-items: center; gap: 10px; flex-shrink: 0;
+ }
+ .wiki-content-toolbar input {
+ flex: 1; background: transparent; border: none; color: var(--text);
+ font-family: 'IBM Plex Sans', sans-serif; font-size: 1.05rem; font-weight: 600;
+ outline: none; min-width: 0;
+ }
+ .wiki-content-toolbar input::placeholder { color: var(--muted); }
+ .wiki-tag-input { background: var(--surface2); border: 1px solid var(--border); border-radius: 20px; color: var(--muted); font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; padding: 3px 10px; outline: none; width: 120px; transition: border-color 0.2s; }
+ .wiki-tag-input:focus { border-color: var(--accent); color: var(--text); }
+ .wiki-tag-input::placeholder { color: var(--muted); }
+
+ .wiki-editor-wrap { flex: 1; overflow: hidden; display: flex; position: relative; }
+
+ /* Edit mode */
+ .wiki-textarea {
+ width: 100%; height: 100%; background: var(--bg); border: none; resize: none;
+ color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 0.84rem;
+ line-height: 1.7; padding: 22px 28px; outline: none; tab-size: 2;
+ }
+
+ /* View mode – rendered markdown */
+ .wiki-rendered {
+ flex: 1; overflow-y: auto; padding: 22px 28px;
+ font-size: 0.9rem; line-height: 1.75; color: var(--text);
+ }
+ .wiki-rendered h1 { font-size: 1.5rem; color: var(--accent2); margin: 0 0 14px; border-bottom: 2px solid var(--border); padding-bottom: 6px; }
+ .wiki-rendered h2 { font-size: 1.15rem; color: var(--accent2); margin: 22px 0 10px; border-bottom: 1px solid var(--border); padding-bottom: 4px; }
+ .wiki-rendered h3 { font-size: 1rem; color: var(--accent); margin: 16px 0 8px; }
+ .wiki-rendered p { margin: 0 0 12px; }
+ .wiki-rendered ul, .wiki-rendered ol { margin: 0 0 12px 22px; }
+ .wiki-rendered li { margin-bottom: 4px; }
+ .wiki-rendered code { font-family: 'IBM Plex Mono', monospace; font-size: 0.82rem; background: #181818; border: 1px solid #3a1a1a; border-radius: 4px; padding: 1px 6px; color: #fff; }
+ .wiki-rendered pre { background: #181818; border: 1px solid #3a1a1a; border-left: 3px solid var(--accent); border-radius: 5px; padding: 12px 14px; overflow-x: auto; margin: 0 0 14px; position: relative; }
+ .wiki-rendered pre code { background: none; border: none; padding: 0; font-size: 0.8rem; }
+ .wiki-rendered pre .wiki-copy { position: absolute; top: 6px; right: 8px; background: #2a1a1a; border: 1px solid #3a1a1a; border-radius: 4px; color: #e03030; font-size: 0.65rem; cursor: pointer; padding: 2px 7px; font-family: 'IBM Plex Mono', monospace; transition: background 0.15s; }
+ .wiki-rendered pre .wiki-copy:hover { background: #3a1a1a; }
+ .wiki-rendered blockquote { border-left: 3px solid var(--accent); margin: 0 0 12px; padding: 4px 0 4px 14px; color: var(--muted); }
+ .wiki-rendered table { border-collapse: collapse; width: 100%; margin: 0 0 14px; }
+ .wiki-rendered th { background: var(--surface2); border: 1px solid var(--border); padding: 8px 12px; text-align: left; font-size: 0.82rem; color: var(--accent2); }
+ .wiki-rendered td { border: 1px solid var(--border); padding: 7px 12px; font-size: 0.84rem; }
+ .wiki-rendered tr:nth-child(even) td { background: var(--surface); }
+ .wiki-rendered a { color: var(--accent); }
+ .wiki-rendered hr { border: none; border-top: 1px solid var(--border); margin: 18px 0; }
+ .wiki-rendered strong { color: var(--accent2); }
+ .wiki-rendered em { color: var(--muted); font-style: italic; }
+
+ /* Checkbox lists */
+ .wiki-rendered .wiki-check { display: flex; align-items: flex-start; gap: 8px; margin-bottom: 4px; }
+ .wiki-rendered .wiki-check input { margin-top: 3px; accent-color: var(--accent); }
+
+ .wiki-mode-btns { display: flex; gap: 4px; flex-shrink: 0; }
+ .wiki-mode-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--muted); font-size: 0.74rem; padding: 5px 10px; cursor: pointer; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; }
+ .wiki-mode-btn.active, .wiki-mode-btn:hover { border-color: var(--accent); color: var(--accent); }
+ .wiki-format-btns { display: flex; gap: 3px; flex-shrink: 0; }
+ .wiki-fmt-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 4px; color: var(--muted); font-size: 0.75rem; padding: 4px 7px; cursor: pointer; transition: all 0.15s; font-family: 'IBM Plex Mono', monospace; }
+ .wiki-fmt-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+ .wiki-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--muted); font-size: 0.88rem; gap: 12px; }
+ .wiki-placeholder .emoji { font-size: 2.5rem; }
+ .wiki-status { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; color: var(--muted); padding: 6px 20px; border-top: 1px solid var(--border); background: var(--surface); flex-shrink: 0; display: flex; justify-content: space-between; }
+
+ /* ════ SCRIPTS ════ */
+ #pageScripts { padding: 24px 28px 60px; max-width: 1000px; width: 100%; margin: 0 auto; align-self: center; overflow-y: auto; }
+ .scripts-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+ .scripts-search { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; padding: 6px 12px; width: 200px; outline: none; transition: border-color 0.2s; }
+ .scripts-search:focus { border-color: var(--accent); }
+ .scripts-search::placeholder { color: var(--muted); }
+ .lang-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+ .lang-pill { font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); color: var(--muted); background: var(--surface2); cursor: pointer; transition: all 0.15s; user-select: none; }
+ .lang-pill:hover { border-color: var(--accent); color: var(--accent); }
+ .lang-pill.active { background: var(--tag-bg); border-color: var(--accent); color: var(--accent2); }
+
+ .script-card {
+ background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+ margin-bottom: 12px; overflow: hidden; transition: border-color 0.2s; animation: fadeIn 0.2s ease;
+ }
+ .script-card:hover { border-color: var(--accent); }
+ .script-card-header { display: flex; align-items: center; gap: 10px; padding: 13px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+ .script-lang-badge { font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; border: 1px solid; flex-shrink: 0; }
+ .lang-ps { color: #5bc0eb; border-color: #2a4a5a; background: #0d2030; }
+ .lang-bash { color: #a8e063; border-color: #2a4a1a; background: #0d2010; }
+ .lang-py { color: #ffd43b; border-color: #4a3a00; background: #201800; }
+ .lang-js { color: #f7df1e; border-color: #3a3000; background: #181400; }
+ .lang-other{ color: var(--muted); border-color: var(--border); background: var(--surface); }
+ .script-card-title { font-weight: 600; font-size: 0.92rem; color: var(--text); flex: 1; }
+ .script-card-tag { font-family: 'IBM Plex Mono', monospace; font-size: 0.63rem; color: var(--muted); background: var(--tag-bg); border: 1px solid #3a1a1a; padding: 2px 7px; border-radius: 10px; }
+ .script-card-desc { font-size: 0.78rem; color: var(--muted); padding: 8px 16px 0; }
+ .script-card-actions { display: flex; gap: 5px; flex-shrink: 0; }
+ .script-code-wrap { position: relative; }
+ .script-code-wrap pre { margin: 0; background: #0f0f0f; border-top: 1px solid #2a2a2a; padding: 14px 16px 14px 16px; overflow-x: auto; max-height: 280px; }
+ .script-code-wrap code { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: #e0e0e0; white-space: pre; }
+ .script-copy-btn { position: absolute; top: 8px; right: 10px; background: #2a1a1a; border: 1px solid #3a1a1a; border-radius: 4px; color: #e03030; font-size: 0.67rem; cursor: pointer; padding: 3px 8px; font-family: 'IBM Plex Mono', monospace; transition: background 0.15s; }
+ .script-copy-btn:hover { background: #3a1a1a; }
+ .script-copy-btn.copied { color: #4caf50; }
+ .script-card-footer { display: flex; align-items: center; justify-content: space-between; padding: 6px 14px; border-top: 1px solid var(--border); }
+ .script-card-meta { font-family: 'IBM Plex Mono', monospace; font-size: 0.62rem; color: var(--muted); }
+
+ /* Script modal */
+ .lang-select { width: 100%; background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 0.86rem; padding: 8px 10px; outline: none; transition: border-color 0.2s; }
+ .lang-select:focus { border-color: var(--accent); }
+ .script-textarea { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; min-height: 200px; background: #0f0f0f; color: #e0e0e0; border-color: #2a2a2a; tab-size: 2; resize: vertical; }
+
+ /* ════ LINKS ════ */
+ #pageLinks { padding: 24px 28px 60px; max-width: 1100px; width: 100%; margin: 0 auto; align-self: center; overflow-y: auto; }
+ .links-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; gap: 10px; flex-wrap: wrap; }
+ .links-search { background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius); color: var(--text); font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; padding: 6px 12px; width: 200px; outline: none; transition: border-color 0.2s; }
+ .links-search:focus { border-color: var(--accent); }
+ .links-search::placeholder { color: var(--muted); }
+ .link-filters { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+
+ #linksGrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+ .link-card {
+ background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+ padding: 15px; display: flex; flex-direction: column; gap: 8px;
+ transition: border-color 0.2s, transform 0.15s; animation: fadeIn 0.2s ease;
+ position: relative; cursor: default;
+ }
+ .link-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+ .link-card:hover .link-card-actions { opacity: 1; }
+ .link-card-actions { position: absolute; top: 8px; right: 8px; display: flex; gap: 3px; opacity: 0; transition: opacity 0.15s; }
+ .link-card-top { display: flex; align-items: center; gap: 10px; }
+ .link-favicon { width: 24px; height: 24px; border-radius: 5px; object-fit: contain; flex-shrink: 0; background: var(--surface2); }
+ .link-favicon-fallback { width: 24px; height: 24px; border-radius: 5px; background: var(--accent); display: flex; align-items: center; justify-content: center; color: #fff; font-size: 0.7rem; font-weight: 700; font-family: 'IBM Plex Mono', monospace; flex-shrink: 0; }
+ .link-title { font-weight: 600; font-size: 0.9rem; color: var(--text); flex: 1; word-break: break-word; }
+ .link-url { font-family: 'IBM Plex Mono', monospace; font-size: 0.67rem; color: var(--accent); word-break: break-all; line-height: 1.3; }
+ .link-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.4; }
+ .link-tag { display: inline-block; background: var(--tag-bg); color: var(--accent2); font-family: 'IBM Plex Mono', monospace; font-size: 0.6rem; padding: 1px 7px; border-radius: 20px; border: 1px solid #5a1a1a; }
+ .link-card-btns { display: flex; gap: 5px; margin-top: 2px; }
+ .link-btn { background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; color: var(--muted); font-size: 0.7rem; padding: 4px 9px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; transition: all 0.15s; text-decoration: none; display: inline-block; }
+ .link-btn:hover { border-color: var(--accent); color: var(--accent); }
+ .link-btn.copied { color: #4caf50; border-color: #4caf50; }
+
+ /* ── LIGHT THEME ── */
+ body.light {
+ --bg: #f0f0f0;
+ --surface: #ffffff;
+ --surface2: #e8e8e8;
+ --border: #cccccc;
+ --accent: #cc2020;
+ --accent2: #111111;
+ --text: #1a1a1a;
+ --muted: #666666;
+ --danger: #dd2222;
+ --tag-bg: #ffe0e0;
+ }
+ body.light .os-switcher { background: #e0e0e0; }
+ body.light .os-switch-btn:hover { background: #d0d0d0; }
+ body.light .os-switch-btn.active { background: #c8c8c8; }
+ body.light .card-ps, body.light .script-code-wrap pre,
+ body.light .todo-item-ps, body.light .app-row-ps,
+ body.light .wiki-textarea { background: #1e1e1e; }
+ body.light .wiki-rendered pre { background: #1e1e1e; }
+ body.light .drop-zone { background: #f8f8f8; }
+ body.light header { background: #ffffff; }
+ body.light .tab-bar { background: #ffffff; }
+
+ /* ── THEME TOGGLE BTN ── */
+ .theme-btn {
+ background: none; border: 1px solid var(--border); border-radius: var(--radius);
+ color: var(--muted); font-size: 1rem; padding: 5px 9px; cursor: pointer;
+ transition: all 0.15s; line-height: 1;
+ }
+ .theme-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+ /* ── IMPORT/EXPORT BTNS ── */
+ .io-btn {
+ background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+ color: var(--muted); font-size: 0.75rem; padding: 5px 10px; cursor: pointer;
+ transition: all 0.15s; font-family: 'IBM Plex Mono', monospace;
+ }
+ .io-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+ /* ── POCKETBASE STATUS ── */
+ .pb-status {
+ font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; color: var(--muted);
+ display: flex; align-items: center; gap: 5px; white-space: nowrap;
+ }
+ .pb-status .pb-dot { font-size: 0.55rem; }
+ .pb-settings-btn {
+ background: none; border: 1px solid var(--border); border-radius: var(--radius);
+ color: var(--muted); font-size: 0.7rem; padding: 3px 8px; cursor: pointer;
+ font-family: 'IBM Plex Mono', monospace; transition: all 0.15s;
+ }
+ .pb-settings-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+ /* ── PINNED ── */
+ .pin-btn { background:none; border:none; cursor:pointer; font-size:0.85rem; padding:2px 4px; opacity:0.4; transition:opacity 0.15s,transform 0.15s; }
+ .pin-btn:hover, .pin-btn.pinned { opacity:1; }
+ .pin-btn.pinned { transform: rotate(-45deg); }
+ .pinned-section { margin-bottom: 20px; }
+ .pinned-label { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+ .pinned-label::after { content:''; flex:1; height:1px; background:var(--border); }
+
+ /* ── RECENT ── */
+ .recent-section { margin-bottom: 24px; }
+ .recent-strip { display:flex; gap:10px; overflow-x:auto; padding-bottom:4px; }
+ .recent-chip { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:7px 12px; font-size:0.78rem; color:var(--text); cursor:pointer; white-space:nowrap; transition:border-color 0.15s; flex-shrink:0; display:flex; align-items:center; gap:6px; }
+ .recent-chip:hover { border-color:var(--accent); }
+ .recent-chip-icon { font-size:1rem; }
+
+ /* ── DRAG & DROP ── */
+ .card[draggable], .todo-item[draggable] { cursor: grab; }
+ .card[draggable]:active, .todo-item[draggable]:active { cursor: grabbing; }
+ .card.drag-over { border-color: var(--accent); background: var(--tag-bg); opacity:0.7; }
+ .todo-item.drag-over { border-top: 2px solid var(--accent); }
+ .drag-handle { color:var(--muted); font-size:0.8rem; cursor:grab; padding:0 4px; opacity:0.4; transition:opacity 0.15s; flex-shrink:0; }
+ .drag-handle:hover { opacity:1; }
+
+ /* ── GLOBAL SEARCH OVERLAY ── */
+ .gsearch-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:500; align-items:flex-start; justify-content:center; padding-top:80px; }
+ .gsearch-overlay.open { display:flex; }
+ .gsearch-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; width:100%; max-width:640px; overflow:hidden; }
+ .gsearch-input-wrap { display:flex; align-items:center; padding:14px 16px; gap:10px; border-bottom:1px solid var(--border); }
+ .gsearch-input-wrap span { font-size:1.1rem; }
+ .gsearch-input { flex:1; background:none; border:none; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:1rem; outline:none; }
+ .gsearch-input::placeholder { color:var(--muted); }
+ .gsearch-results { max-height:420px; overflow-y:auto; }
+ .gsearch-section { padding:6px 0; }
+ .gsearch-section-label { font-family:'IBM Plex Mono',monospace; font-size:0.63rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.1em; padding:6px 16px; }
+ .gsearch-item { display:flex; align-items:center; gap:10px; padding:9px 16px; cursor:pointer; transition:background 0.12s; }
+ .gsearch-item:hover { background:var(--surface2); }
+ .gsearch-item-icon { font-size:1rem; flex-shrink:0; }
+ .gsearch-item-body { flex:1; min-width:0; }
+ .gsearch-item-title { font-size:0.86rem; color:var(--text); font-weight:600; }
+ .gsearch-item-sub { font-size:0.72rem; color:var(--muted); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+ .gsearch-item-tag { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; color:var(--accent); flex-shrink:0; }
+ .gsearch-empty { padding:30px; text-align:center; color:var(--muted); font-size:0.86rem; }
+ .gsearch-hint { padding:8px 16px; font-family:'IBM Plex Mono',monospace; font-size:0.63rem; color:var(--muted); border-top:1px solid var(--border); display:flex; justify-content:space-between; }
+
+ /* ── DASHBOARD ── */
+ #pageDash { padding:24px 28px 60px; max-width:1000px; width:100%; margin:0 auto; align-self:center; overflow-y:auto; }
+ .dash-greeting { font-family:'IBM Plex Mono',monospace; font-size:1.1rem; color:var(--accent2); margin-bottom:22px; }
+ .dash-greeting span { color:var(--accent); }
+ .dash-stats { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); gap:12px; margin-bottom:24px; }
+ .stat-card { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:16px 14px; text-align:center; transition:border-color 0.2s,transform 0.15s; cursor:pointer; }
+ .stat-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+ .stat-card-num { font-family:'IBM Plex Mono',monospace; font-size:1.8rem; font-weight:600; color:var(--accent2); line-height:1; }
+ .stat-card-label { font-size:0.72rem; color:var(--muted); margin-top:4px; }
+ .stat-card-icon { font-size:1.4rem; margin-bottom:6px; }
+ .dash-section { margin-bottom:24px; }
+ .dash-section-title { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--accent); text-transform:uppercase; letter-spacing:0.1em; margin-bottom:12px; }
+ .dash-todo-row { display:flex; gap:16px; }
+ .dash-todo-box { flex:1; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:14px 16px; }
+ .dash-todo-box-label { font-size:0.82rem; font-weight:600; color:var(--text); margin-bottom:10px; }
+ .dash-progress-label { font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:var(--muted); margin-bottom:5px; display:flex; justify-content:space-between; }
+ .dash-progress-bar { height:5px; background:var(--surface2); border-radius:10px; overflow:hidden; margin-bottom:8px; }
+ .dash-progress-fill { height:100%; background:var(--accent); border-radius:10px; transition:width 0.3s; }
+ .dash-recent { display:flex; flex-direction:column; gap:8px; }
+ .dash-recent-item { background:var(--surface); border:1px solid var(--border); border-radius:6px; padding:10px 14px; display:flex; align-items:center; gap:10px; cursor:pointer; transition:border-color 0.15s; }
+ .dash-recent-item:hover { border-color:var(--accent); }
+ .dash-recent-icon { font-size:1rem; flex-shrink:0; }
+ .dash-recent-info { flex:1; min-width:0; }
+ .dash-recent-name { font-size:0.84rem; color:var(--text); font-weight:600; }
+ .dash-recent-meta { font-family:'IBM Plex Mono',monospace; font-size:0.66rem; color:var(--muted); }
+
+ /* ── SCRATCH PAD ── */
+ .pad-toolbar { background:var(--surface); border-bottom:1px solid var(--border); padding:10px 20px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; }
+ .pad-toolbar-left { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--muted); }
+ .pad-textarea { flex:1; background:var(--bg); border:none; resize:none; color:var(--text); font-family:'IBM Plex Mono',monospace; font-size:0.88rem; line-height:1.8; padding:24px 32px; outline:none; tab-size:2; }
+ .pad-status { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:var(--muted); padding:6px 20px; border-top:1px solid var(--border); background:var(--surface); flex-shrink:0; display:flex; justify-content:space-between; }
+
+ /* ── TAGS MANAGER ── */
+ .tags-modal { max-width:560px; }
+ .tags-list { display:flex; flex-direction:column; gap:6px; max-height:400px; overflow-y:auto; }
+ .tag-row { display:flex; align-items:center; gap:8px; background:var(--surface2); border:1px solid var(--border); border-radius:6px; padding:8px 12px; }
+ .tag-row-name { flex:1; font-size:0.85rem; color:var(--text); }
+ .tag-row-counts { font-family:'IBM Plex Mono',monospace; font-size:0.66rem; color:var(--muted); display:flex; gap:6px; }
+ .tag-count-pill { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:1px 6px; }
+ .tag-row-actions { display:flex; gap:4px; }
+ .tag-rename-inline { flex:1; background:var(--surface); border:1px solid var(--accent); border-radius:4px; color:var(--text); font-family:'IBM Plex Sans',sans-serif; font-size:0.83rem; padding:2px 8px; outline:none; }
+
+ /* ── TIMELINE ── */
+ #pageTimeline { padding:24px 28px 60px; max-width:860px; width:100%; margin:0 auto; align-self:center; overflow-y:auto; }
+ .timeline-toolbar { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; }
+ .timeline-list { display:flex; flex-direction:column; }
+ .timeline-day { margin-bottom:20px; }
+ .timeline-day-label { font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--accent); text-transform:uppercase; letter-spacing:0.08em; margin-bottom:8px; border-left:3px solid var(--accent); padding-left:10px; }
+ .timeline-item { display:flex; gap:12px; align-items:flex-start; padding:9px 0 9px 14px; border-left:1px solid var(--border); margin-left:3px; position:relative; }
+ .timeline-item::before { content:''; position:absolute; left:-4px; top:14px; width:7px; height:7px; border-radius:50%; background:var(--border); border:1px solid var(--surface); }
+ .timeline-item.create::before { background:var(--accent); }
+ .timeline-item.edit::before { background:#5bc0eb; }
+ .timeline-item.delete::before { background:var(--danger); }
+ .timeline-icon { font-size:0.9rem; flex-shrink:0; margin-top:1px; }
+ .timeline-body { flex:1; min-width:0; }
+ .timeline-text { font-size:0.84rem; color:var(--text); }
+ .timeline-text strong { color:var(--accent2); }
+ .timeline-meta { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:var(--muted); margin-top:2px; }
+ .timeline-tag { font-family:'IBM Plex Mono',monospace; font-size:0.62rem; color:var(--accent); background:var(--tag-bg); border:1px solid #3a1a1a; padding:1px 6px; border-radius:10px; }
+ .timeline-empty { text-align:center; padding:60px 20px; color:var(--muted); font-size:0.86rem; }
+
+ /* ── TEMPLATES ── */
+ .templates-modal { max-width:560px; }
+ .template-list { display:flex; flex-direction:column; gap:8px; max-height:450px; overflow-y:auto; }
+ .template-item { background:var(--surface2); border:1px solid var(--border); border-radius:7px; padding:12px 14px; cursor:pointer; transition:border-color 0.15s; }
+ .template-item:hover { border-color:var(--accent); }
+ .template-item-title { font-weight:600; font-size:0.9rem; color:var(--text); margin-bottom:3px; }
+ .template-item-desc { font-size:0.76rem; color:var(--muted); }
+ .template-item-count { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:var(--accent); margin-top:4px; }
+
+ /* ──QR CODE ── */
+ .qr-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); z-index:600; align-items:center; justify-content:center; }
+ .qr-overlay.open { display:flex; }
+ .qr-box { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:24px; text-align:center; max-width:280px; width:100%; }
+ .qr-box h3 { font-family:'IBM Plex Mono',monospace; font-size:0.82rem; color:var(--accent); margin-bottom:16px; }
+ .qr-box #qrCanvas { margin:0 auto; }
+ .qr-box-url { font-family:'IBM Plex Mono',monospace; font-size:0.65rem; color:var(--muted); margin-top:12px; word-break:break-all; }
+ .qr-close { margin-top:14px; }
+ </style>
+</head>
+<body>
+
+<!-- ═══ OS SWITCHER ═══ -->
+<div class="os-switcher">
+ <button class="os-switch-btn active" id="osBtnWin" onclick="switchOs('win')">
+  Windows
+ </button>
+ <div class="os-divider"></div>
+ <button class="os-switch-btn" id="osBtnLin" onclick="switchOs('lin')">
+ Linux
+ </button>
+</div>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+ <div class="header-os-label" id="headerOsLabel"> Windows</div>
+ <div class="header-right">
+ <button class="io-btn" onclick="openGlobalSearch()" title="GlobalSearch (Ctrl+K)">Search</button>
+ <button class="io-btn" onclick="openTagsManager()" title="Tags Manager">Tags</button>
+ <button class="io-btn" onclick="exportData()" title="Export all data as JSON">Export</button>
+ <label class="io-btn" for="importFile" title="Import JSON data">Import</label>
+ <input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)" />
+ <input type="text" id="searchInput" placeholder="Search …" oninput="onSearch()" style="display:none" />
+ <span class="pb-status" id="pbStatus"><span class="pb-dot" style="color:#666">⬤</span> Local</span>
+ <button class="pb-settings-btn" onclick="openPbSettings()" title="PocketBase Settings">PB ⚙</button>
+ <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle Light/Dark"></button>
+ <button class="btn btn-primary btn-sm" id="addBtn" onclick="openModal()">+ New</button>
+ </div>
+</header>
+
+<!-- ═══ TAB BAR ═══ -->
+<div class="tab-bar">
+ <div class="tab active" id="tabDash" onclick="switchTab('dash')"> Dashboard</div>
+ <div class="tab" id="tabAll" onclick="switchTab('all')">All Programs</div>
+ <div class="tab" id="tabCat" onclick="switchTab('cat')">Categories</div>
+ <div class="tab" id="tabTodo" onclick="switchTab('todo')">Setup ToDo</div>
+ <div class="tab" id="tabFiles" onclick="switchTab('files')">Files</div>
+ <div class="tab" id="tabWiki" onclick="switchTab('wiki')">Wiki</div>
+ <div class="tab" id="tabScripts" onclick="switchTab('scripts')">Scripts</div>
+ <div class="tab" id="tabLinks" onclick="switchTab('links')">Links</div>
+ <div class="tab" id="tabTimeline" onclick="switchTab('timeline')"> Timeline</div>
+</div>
+
+<!-- ═══ PAGE: All Programs ═══ -->
+<div class="page" id="pageAll">
+ <div class="toolbar">
+ <span class="count-badge" id="countBadge"><strong>0</strong> Programs</span>
+ </div>
+ <div id="grid"></div>
+ <div class="empty-state" id="emptyAll">
+ 
+ <p>Noch keine Programs eingetragen.<br>Klicke auf <strong>+ New</strong>.</p>
+ </div>
+</div>
+
+<!-- ═══ PAGE: Categories ═══ -->
+<div class="page" id="pageCat">
+ <div class="cat-sidebar">
+ <div class="cat-sidebar-header"><h2>Categories</h2></div>
+ <div class="cat-list" id="catList"></div>
+ <div class="cat-new-row">
+ <input type="text" id="newCatInput" placeholder="New Category …" onkeydown="if(event.key==='Enter')addCategory()" />
+ <button class="btn btn-primary btn-sm" onclick="addCategory()">+</button>
+ </div>
+ </div>
+ <div class="cat-content" id="catContent">
+ <div class="cat-placeholder"><p>Select a category on the left.</p></div>
+ </div>
+</div>
+
+<!-- ═══ PAGE: Setup ToDo ═══ -->
+<div class="page" id="pageTodo">
+ <div class="todo-os-content" id="todoOsContent"></div>
+</div>
+
+<!-- ═══ PAGE: Files ═══ -->
+<div class="page" id="pageFiles">
+ <div class="files-toolbar">
+ <div class="files-toolbar-left">
+ <span class="count-badge" id="filesBadge"><strong>0</strong> Files</span>
+ <button class="files-view-btn active" id="viewGrid" onclick="setFileView('grid')" title="Kacheln">⊞</button>
+ <button class="files-view-btn" id="viewList" onclick="setFileView('list')" title="Liste"></button>
+ </div>
+ <button class="btn btn-primary btn-sm" onclick="openFileModal()">+ Add File</button>
+ </div>
+ <div class="file-filters" id="fileFilters"></div>
+ <div id="filesGrid"></div>
+ <div id="filesList" style="display:none"></div>
+ <div class="empty-state" id="emptyFiles" style="display:none">
+ 
+ <p>Noch keine Files eingetragen.<br>Klicke auf <strong>+ Add File</strong>.</p>
+ </div>
+</div>
+
+<!-- ═══ File Modal ═══ -->
+<div class="overlay" id="fileOverlay" onclick="if(event.target===this)closeFileModal()">
+ <div class="modal" style="max-width:520px">
+ <h2 id="fileModalTitle">// Add File</h2>
+ <div class="field">
+ <label>Name *</label>
+ <input type="text" id="ffName" placeholder="z.B. Installationsscript" />
+ </div>
+ <div class="field">
+ <label>Path / URL</label>
+ <input type="text" id="ffPath" placeholder="C:\Scripts\setup.ps1 or https://… or \\server\share" />
+ </div>
+ <div class="field">
+ <label>Upload file (optional – stored locally)</label>
+ <div class="drop-zone" id="fileDropZone" onclick="document.getElementById('ffUpload').click()"
+ ondragover="event.preventDefault();this.classList.add('drag-over')"
+ ondragleave="this.classList.remove('drag-over')"
+ ondrop="onFileDrop(event)">
+ <div class="drop-zone-icon">+</div>
+ <div id="dropZoneLabel">Click or drag file here</div>
+ </div>
+ <input type="file" id="ffUpload" style="display:none" onchange="onFileUpload(this)" />
+ </div>
+ <div class="field">
+ <label>Category / Tag</label>
+ <input type="text" id="ffTag" placeholder="e.g. Scripts, Documents, Images …" list="fileTagSuggestions" />
+ <datalist id="fileTagSuggestions"></datalist>
+ </div>
+ <div class="field">
+ <label>Description</label>
+ <textarea id="ffDesc" placeholder="What is this file for? …"></textarea>
+ </div>
+ <div class="modal-footer">
+ <button class="btn btn-ghost" onclick="closeFileModal()">Cancel</button>
+ <button class="btn btn-primary" onclick="saveFile()">Save</button>
+ </div>
+ </div>
+</div>
+
+<!-- ═══ PAGE: Wiki ═══ -->
+<div class="page" id="pageWiki">
+ <div class="wiki-sidebar">
+ <div class="wiki-sidebar-header">
+ <h2>Wiki</h2>
+ </div>
+ <div class="wiki-search">
+ <input type="text" id="wikiSearch" placeholder="Search pages …" oninput="renderWikiList()" />
+ </div>
+ <div class="wiki-page-list" id="wikiPageList"></div>
+ <div class="wiki-new-btn">
+ <button class="btn btn-primary btn-sm" style="width:100%" onclick="newWikiPage()">+ Newe Seite</button>
+ </div>
+ </div>
+
+ <div class="wiki-content" id="wikiContentArea">
+ <div class="wiki-placeholder">
+ 
+ <p>Select a page on the left or create a new one.</p>
+ </div>
+ </div>
+</div>
+
+<!-- ═══ PAGE: Scripts ═══ -->
+<div class="page" id="pageScripts">
+ <div class="scripts-toolbar">
+ <div style="display:flex;align-items:center;gap:10px">
+ <span class="count-badge" id="scriptsBadge"><strong>0</strong> Scripts</span>
+ <input type="text" class="scripts-search" id="scriptsSearch" placeholder="Search scripts …" oninput="renderScripts()" />
+ </div>
+ <button class="btn btn-primary btn-sm" onclick="openScriptModal()">+ New Script</button>
+ </div>
+ <div class="lang-filters" id="langFilters"></div>
+ <div id="scriptsList"></div>
+ <div class="empty-state" id="emptyScripts" style="display:none">
+ 
+ <p>No scripts yet.<br>Click <strong>+ New Script</strong>.</p>
+ </div>
+</div>
+
+<!-- ═══ PAGE: Links ═══ -->
+<div class="page" id="pageLinks">
+ <div class="links-toolbar">
+ <div style="display:flex;align-items:center;gap:10px">
+ <span class="count-badge" id="linksBadge"><strong>0</strong> Links</span>
+ <input type="text" class="links-search" id="linksSearch" placeholder="Search links …" oninput="renderLinks()" />
+ </div>
+ <button class="btn btn-primary btn-sm" onclick="openLinkModal()">+ New Link</button>
+ </div>
+ <div class="link-filters" id="linkFilters"></div>
+ <div id="linksGrid"></div>
+ <div class="empty-state" id="emptyLinks" style="display:none">
+ 
+ <p>No links yet.<br>Click <strong>+ New Link</strong>.</p>
+ </div>
+</div>
+
+<!-- ═══ Script Modal ═══ -->
+<div class="overlay" id="scriptOverlay" onclick="if(event.target===this)closeScriptModal()">
+ <div class="modal" style="max-width:620px">
+ <h2 id="scriptModalTitle">// New Script</h2>
+ <div style="display:flex;gap:10px">
+ <div class="field" style="flex:1"><label>Name *</label><input type="text" id="sfName" placeholder="e.g. Cleanup temp files" /></div>
+ <div class="field" style="width:150px"><label>Language</label>
+ <select id="sfLang" class="lang-select">
+ <option value="PowerShell">PowerShell</option>
+ <option value="Bash">Bash</option>
+ <option value="Python">Python</option>
+ <option value="JavaScript">JavaScript</option>
+ <option value="CMD">CMD / Batch</option>
+ <option value="SQL">SQL</option>
+ <option value="Other">Other</option>
+ </select>
+ </div>
+ </div>
+ <div class="field"><label>Category / Tag</label><input type="text" id="sfTag" placeholder="e.g. Maintenance,Network …" list="scriptTagList" /><datalist id="scriptTagList"></datalist></div>
+ <div class="field"><label>Description</label><textarea id="sfDesc" placeholder="What does this script do? …"></textarea></div>
+ <div class="field"><label>Script Code *</label><textarea id="sfCode" class="script-textarea" placeholder="# Paste your script here …" onkeydown="scriptTabKey(event)"></textarea></div>
+ <div class="modal-footer">
+ <button class="btn btn-ghost" onclick="closeScriptModal()">Cancel</button>
+ <button class="btn btn-primary" onclick="saveScript()">Save</button>
+ </div>
+ </div>
+</div>
+
+<!-- ═══ Link Modal ═══ -->
+<div class="overlay" id="linkOverlay" onclick="if(event.target===this)closeLinkModal()">
+ <div class="modal" style="max-width:480px">
+ <h2 id="linkModalTitle">// New Link</h2>
+ <div class="field"><label>Title *</label><input type="text" id="lfTitle" placeholder="e.g. Microsoft Docs" /></div>
+ <div class="field"><label>URL *</label><input type="url" id="lfUrl" placeholder="https://…" oninput="autoFillLinkTitle()" /></div>
+ <div class="field"><label>Category / Tag</label><input type="text" id="lfTag" placeholder="e.g. Documentation, Tools …" list="linkTagList" /><datalist id="linkTagList"></datalist></div>
+ <div class="field"><label>Description</label><textarea id="lfDesc" placeholder="Notes about this link …"></textarea></div>
+ <div class="modal-footer">
+ <button class="btn btn-ghost" onclick="closeLinkModal()">Cancel</button>
+ <button class="btn btn-primary" onclick="saveLink()">Save</button>
+ </div>
+ </div>
+</div>
+
+<!-- ═══ PAGE: Dashboard ═══ -->
+<div class="page active" id="pageDash">
+ <div class="dash-greeting" id="dashGreeting">// <span>Dashboard</span></div>
+ <div class="dash-stats" id="dashStats"></div>
+ <div class="dash-todo-row" id="dashTodoRow"></div>
+ <div class="dash-section" style="margin-top:20px">
+ <div class="dash-section-title">Recent Activity</div>
+ <div class="dash-recent" id="dashRecent"></div>
+ </div>
+</div>
+
+<!-- ═══ PAGE: Timeline ═══ -->
+<div class="page" id="pageTimeline">
+ <div class="timeline-toolbar">
+ <span class="count-badge" id="timelineBadge"><strong>0</strong> Events</span>
+ <button class="io-btn" onclick="clearTimeline()">Clear Log</button>
+ </div>
+ <div id="timelineList"></div>
+</div>
+
+<!-- ═══ GlobalSearch Overlay ═══ -->
+<div class="gsearch-overlay" id="gsearchOverlay" onclick="if(event.target===this)closeGlobalSearch()">
+ <div class="gsearch-box">
+ <div class="gsearch-input-wrap">
+ 
+ <input type="text" class="gsearch-input" id="gsearchInput" placeholder="Search everything …" oninput="runGlobalSearch()" />
+ <span style="font-family:var(--mono);font-size:0.65rem;color:var(--muted)">ESC to close</span>
+ </div>
+ <div class="gsearch-results" id="gsearchResults"><div class="gsearch-empty">Start typing to search across all tabs</div></div>
+ <div class="gsearch-hint"><span>Enter → open</span><span>Ctrl+K to open</span></div>
+ </div>
+</div>
+
+<!-- ═══Tags Manager Modal ═══ -->
+<div class="overlay" id="tagsOverlay" onclick="if(event.target===this)closeTagsManager()">
+ <div class="modal tags-modal">
+ <h2>//Tags Manager</h2>
+ <p style="font-size:0.78rem;color:var(--muted);margin-bottom:14px">Rename a tag to update it everywhere across all tabs.</p>
+ <div class="tags-list" id="tagsManagerList"></div>
+ <div class="modal-footer"><button class="btn btn-ghost" onclick="closeTagsManager()">Close</button></div>
+ </div>
+</div>
+
+<!-- ═══Templates Modal ═══ -->
+<div class="overlay" id="templatesOverlay" onclick="if(event.target===this)closeTemplates()">
+ <div class="modal templates-modal">
+ <h2>// Load Checklist Template</h2>
+ <p style="font-size:0.78rem;color:var(--muted);margin-bottom:14px">Select a template to add its sections to the current Setup ToDo list.</p>
+ <div class="template-list" id="templateList"></div>
+ <div class="modal-footer"><button class="btn btn-ghost" onclick="closeTemplates()">Cancel</button></div>
+ </div>
+</div>
+
+<!-- ═══QR Code Modal ═══ -->
+<div class="qr-overlay" id="qrOverlay" onclick="if(event.target===this)closeQR()">
+ <div class="qr-box">
+ <h3>//QR Code</h3>
+ <div id="qrCanvas"></div>
+ <div class="qr-box-url" id="qrUrl"></div>
+ <button class="btn btn-ghost qr-close" onclick="closeQR()">Close</button>
+ </div>
+</div>
+
+<!-- ═══ PocketBase Settings Modal ═══ -->
+<div class="overlay" id="pbSettingsOverlay" onclick="if(event.target===this)closePbSettings()">
+ <div class="modal" style="max-width:420px">
+ <h2>// PocketBase Settings</h2>
+ <p style="font-size:0.78rem;color:var(--muted);margin-bottom:14px">Gib die URL deines PocketBase-Servers ein (z.B. Raspberry Pi im LAN).</p>
+ <div class="field">
+ <label>Server URL</label>
+ <input type="text" id="pbUrlInput" placeholder="http://192.168.1.100:8090" />
+ </div>
+ <p style="font-size:0.72rem;color:var(--muted);margin-top:8px">
+ PocketBase Collection: <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent)">store</code><br>
+ Felder: <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent)">key</code> (Text, unique) · <code style="font-family:'IBM Plex Mono',monospace;color:var(--accent)">val</code> (Text)
+ </p>
+ <div class="modal-footer">
+ <button class="btn btn-ghost" onclick="closePbSettings()">Cancel</button>
+ <button class="btn btn-primary" onclick="savePbSettings()">Verbinden</button>
+ </div>
+ </div>
+</div>
+
+<!-- ═══ Entry Modal ═══ -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeModal()">
+ <div class="modal">
+ <h2 id="modalTitle">// Neues Program</h2>
+ <div class="field"><label>Name *</label><input type="text" id="fName" placeholder="e.g. Visual Studio Code" /></div>
+ <div class="field"><label>Link / URL</label><input type="url" id="fUrl" placeholder="https://…" /></div>
+ <div class="field">
+ <label>Category / Tag</label>
+ <input type="text" id="fTag" placeholder="e.g. Development, Design …" list="tagSuggestions" />
+ <datalist id="tagSuggestions"></datalist>
+ </div>
+ <div class="field"><label>Comment</label><textarea id="fComment" placeholder="Notes, purpose …"></textarea></div>
+ <div class="field">
+ <label>Command (PS / Shell)</label>
+ <textarea id="fPs" placeholder="e.g. winget install … / apt install …"
+ style="font-family:'IBM Plex Mono',monospace;font-size:0.79rem;min-height:80px;color:#fff;background:#181818;border-color:#3a1a1a;"></textarea>
+ </div>
+ <div class="field">
+ <label>Icon / Image</label>
+ <div class="icon-field">
+ <div class="icon-preview-wrap" id="iconPreviewWrap" onclick="clearIconIfSet(event)">
+ 
+ <div class="icon-clear" id="iconClearBtn"></div>
+ </div>
+ <div class="icon-inputs">
+ <input type="text" id="fIconUrl" placeholder="Image URL (https://…)" oninput="onIconUrlInput()" />
+ <label class="icon-upload-btn" for="fIconFile"> Upload file …</label>
+ <input type="file" id="fIconFile" accept="image/*" onchange="onIconFileChange(this)" />
+ <input type="text" id="fIconEmoji" placeholder="Or emoji e.g. " oninput="onEmojiInput()" maxlength="4" />
+ </div>
+ </div>
+ </div>
+ <div class="modal-footer">
+ <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+ <button class="btn btn-primary" onclick="saveEntry()">Save</button>
+ </div>
+ </div>
+</div>
+
+<!-- ═══ Todo Item Modal ═══ -->
+<div class="overlay" id="todoItemOverlay" onclick="if(event.target===this)closeTodoItemModal()">
+ <div class="modal">
+ <h2 id="todoItemModalTitle">// Aufgabe</h2>
+ <div class="field"><label>Task *</label><input type="text" id="tLabel" placeholder="e.g. Install updates" /></div>
+ <div class="field"><label>Note / Hint</label><textarea id="tNote" placeholder="Optionale Description …"></textarea></div>
+ <div class="field">
+ <label>Command (PS / Shell)</label>
+ <textarea id="tPs" placeholder="e.g. winget upgrade --all / apt upgrade"
+ style="font-family:'IBM Plex Mono',monospace;font-size:0.79rem;min-height:70px;color:#fff;background:#181818;border-color:#3a1a1a;"></textarea>
+ </div>
+ <div class="modal-footer">
+ <button class="btn btn-ghost" onclick="closeTodoItemModal()">Cancel</button>
+ <button class="btn btn-primary" onclick="saveTodoItem()">Save</button>
+ </div>
+ </div>
+</div>
+
+<!-- ═══ Todo Section Modal ═══ -->
+<div class="overlay" id="todoSecOverlay" onclick="if(event.target===this)closeTodoSecModal()">
+ <div class="modal" style="max-width:380px">
+ <h2>// Rename section</h2>
+ <div class="field"><label>Name</label><input type="text" id="tSecName" /></div>
+ <div class="modal-footer">
+ <button class="btn btn-ghost" onclick="closeTodoSecModal()">Cancel</button>
+ <button class="btn btn-primary" onclick="saveTodoSection()">Save</button>
+ </div>
+ </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════════
+ STATE
+════════════════════════════════════════════════ */
+const SK_WIN = 'prog_win_v1';
+const SK_LIN = 'prog_lin_v1';
+const SK_TWIN = 'todo_win_v2';
+const SK_TLIN = 'todo_lin_v1';
+
+let currentOs = 'win';
+let currentTab = 'dash';
+let editId = null;
+let selCat = null;
+let editTodoSec = null;
+let editTodoItem = null;
+let addToSecId = null;
+
+let entriesWin = JSON.parse(localStorage.getItem(SK_WIN) || '[]');
+let entriesLin = JSON.parse(localStorage.getItem(SK_LIN) || '[]');
+
+function getEntries() { return currentOs === 'win' ? entriesWin : entriesLin; }
+function setEntries(arr) { if (currentOs === 'win') entriesWin = arr; else entriesLin = arr; }
+function saveEntries() { localStorage.setItem(SK_WIN, JSON.stringify(entriesWin)); localStorage.setItem(SK_LIN, JSON.stringify(entriesLin)); pbSet(SK_WIN, entriesWin); pbSet(SK_LIN, entriesLin); }
+
+/* ════════════════════════════════════════════════
+   POCKETBASE SYNC
+════════════════════════════════════════════════ */
+const PB_COLLECTION = 'store';
+let _pbConnected = false;
+let _pbIdCache = {};
+
+function getPbUrl() { return (localStorage.getItem('pb_url') || 'http://raspberrypi:8090').replace(/\/$/, ''); }
+
+async function _pbFetch(path, opts = {}) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 6000);
+  try {
+    const r = await fetch(getPbUrl() + '/api' + path, {
+      headers: { 'Content-Type': 'application/json' },
+      signal: ctrl.signal,
+      ...opts
+    });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  } finally { clearTimeout(timer); }
+}
+
+async function pbSet(key, value) {
+  if (!_pbConnected) return;
+  try {
+    const valStr = JSON.stringify(value);
+    const cachedId = _pbIdCache[key];
+    if (cachedId) {
+      await _pbFetch('/collections/' + PB_COLLECTION + '/records/' + cachedId, {
+        method: 'PATCH', body: JSON.stringify({ val: valStr })
+      });
+    } else {
+      const created = await _pbFetch('/collections/' + PB_COLLECTION + '/records', {
+        method: 'POST', body: JSON.stringify({ key, val: valStr })
+      });
+      _pbIdCache[key] = created.id;
+    }
+  } catch (e) { console.warn('[PB] sync "' + key + '" failed:', e.message); }
+}
+
+async function pbLoadAll() {
+  try {
+    let page = 1, all = [];
+    while (true) {
+      const res = await _pbFetch('/collections/' + PB_COLLECTION + '/records?perPage=100&page=' + page);
+      res.items.forEach(r => { _pbIdCache[r.key] = r.id; });
+      all.push(...res.items);
+      if (res.page >= res.totalPages) break;
+      page++;
+    }
+    return all;
+  } catch (e) { console.warn('[PB] nicht erreichbar:', e.message); return null; }
+}
+
+function updatePbStatus(status) {
+  const el = document.getElementById('pbStatus');
+  if (!el) return;
+  const cfg = {
+    connecting: { dot: '#f5a623', label: 'Connecting…' },
+    online:     { dot: '#4caf50', label: 'PocketBase'  },
+    offline:    { dot: '#666666', label: 'Local'        }
+  }[status] || { dot: '#666', label: '?' };
+  el.innerHTML = '<span class="pb-dot" style="color:' + cfg.dot + '">⬤</span> ' + cfg.label;
+}
+
+async function initPocketBase() {
+  updatePbStatus('connecting');
+  const records = await pbLoadAll();
+  if (!records) { updatePbStatus('offline'); renderAll(); return; }
+
+  _pbConnected = true;
+  updatePbStatus('online');
+
+  const data = {};
+  records.forEach(r => { try { data[r.key] = JSON.parse(r.val); } catch {} });
+
+  const keys = ['prog_win_v1','prog_lin_v1','todo_win_v2','todo_lin_v1',
+    'files_win_v1','files_lin_v1','wiki_win_v1','wiki_lin_v1',
+    'scripts_win_v1','scripts_lin_v1','links_win_v1','links_lin_v1',
+    'timeline_v1','cat_order_win','cat_order_lin','recent_v1','theme'];
+  keys.forEach(k => { if (data[k] !== undefined) localStorage.setItem(k, JSON.stringify(data[k])); });
+
+  if (data['prog_win_v1'])    entriesWin  = data['prog_win_v1'];
+  if (data['prog_lin_v1'])    entriesLin  = data['prog_lin_v1'];
+  if (data['todo_win_v2'])    todosWin    = data['todo_win_v2'];
+  if (data['todo_lin_v1'])    todosLin    = data['todo_lin_v1'];
+  if (data['files_win_v1'])   filesWin    = data['files_win_v1'];
+  if (data['files_lin_v1'])   filesLin    = data['files_lin_v1'];
+  if (data['scripts_win_v1']) scriptsWin  = data['scripts_win_v1'];
+  if (data['scripts_lin_v1']) scriptsLin  = data['scripts_lin_v1'];
+  if (data['links_win_v1'])   linksWin    = data['links_win_v1'];
+  if (data['links_lin_v1'])   linksLin    = data['links_lin_v1'];
+  if (data['wiki_win_v1'])    wikiWin     = data['wiki_win_v1'];
+  if (data['wiki_lin_v1'])    wikiLin     = data['wiki_lin_v1'];
+  if (data['theme'])          { currentTheme = data['theme']; applyTheme(); }
+
+  renderAll();
+}
+
+function openPbSettings() {
+  document.getElementById('pbUrlInput').value = getPbUrl();
+  document.getElementById('pbSettingsOverlay').classList.add('open');
+}
+function closePbSettings() { document.getElementById('pbSettingsOverlay').classList.remove('open'); }
+async function savePbSettings() {
+  const url = document.getElementById('pbUrlInput').value.trim().replace(/\/$/, '');
+  if (!url) return;
+  localStorage.setItem('pb_url', url);
+  closePbSettings();
+  _pbConnected = false;
+  _pbIdCache = {};
+  await initPocketBase();
+}
+
+/* ════════════════════════════════════════════════
+ OS SWITCH
+════════════════════════════════════════════════ */
+function switchOs(os) {
+ currentOs = os;
+ selCat = null; fileFilter = 'all'; wikiPageId = null; scriptFilter = 'all'; linkFilter = 'all';
+ document.getElementById('osBtnWin').classList.toggle('active', os === 'win');
+ document.getElementById('osBtnLin').classList.toggle('active', os === 'lin');
+ document.getElementById('headerOsLabel').textContent = os === 'win' ? 'Windows' : 'Linux';
+ renderAll();
+}
+
+/* ════════════════════════════════════════════════
+ TAB SWITCH
+════════════════════════════════════════════════ */
+function switchTab(tab) {
+ currentTab = tab;
+ ['dash','all','cat','todo','files','wiki','scripts','links','timeline'].forEach(t => {
+ document.getElementById('tab' + t[0].toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+ document.getElementById('page' + t[0].toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+ });
+ document.getElementById('addBtn').style.display = ['todo','files','wiki','scripts','links','timeline','dash'].includes(tab) ? 'none' : '';
+ renderAll();
+}
+
+function onSearch() {
+ if (currentTab === 'all') renderCards();
+ else if (currentTab === 'cat') renderCatContent();
+}
+
+function renderAll() {
+ renderDashboard();
+ renderCards();
+ renderCatSidebar();
+ renderTodos();
+ renderFiles();
+ renderWikiList();
+ renderScripts();
+ renderLinks();
+ renderTimeline();
+}
+
+/* ════════════════════════════════════════════════
+ ALLE PROGRAMME
+════════════════════════════════════════════════ */
+function renderCards() {
+ const q = document.getElementById('searchInput').value.toLowerCase();
+ const entries = getEntries();
+ const filtered = entries.filter(e => [e.name,e.url,e.tag,e.comment,e.ps].some(v => v && v.toLowerCase().includes(q)));
+ const grid = document.getElementById('grid');
+ const empty = document.getElementById('emptyAll');
+ document.getElementById('countBadge').innerHTML = `<strong>${entries.length}</strong> Program${entries.length!==1?'e':''}`;
+ if (!filtered.length) { grid.innerHTML=''; empty.style.display='block'; return; }
+ empty.style.display = 'none';
+ grid.innerHTML = filtered.map(cardHtml).join('');
+}
+
+function cardHtml(e) {
+ const pinCls = e.pinned ? ' pinned' : '';
+ const iconHtml = e.icon
+ ? (e.icon.startsWith('data:') || e.icon.startsWith('http') || e.icon.startsWith('/')
+ ? `<img class="card-icon" src="${esc(e.icon)}" alt="" onerror="this.style.display='none'" />`
+ : `<div class="card-icon-placeholder">${esc(e.icon)}</div>`)
+ : '';
+ return `<div class="card" draggable="true" ondragstart="dragCardStart(event,${e.id})" ondragover="dragCardOver(event)" ondrop="dragCardDrop(event,${e.id})" ondragleave="this.classList.remove('drag-over')">
+ <div class="card-header">
+ <div class="card-header-left">
+ <span class="drag-handle" title="Drag to reorder">⠿</span>
+ ${iconHtml}
+ <span class="card-name">${esc(e.name)}</span>
+ </div>
+ <div class="card-actions">
+ <button class="pin-btn${e.pinned?' pinned':''}" onclick="togglePin(${e.id})" title="${e.pinned?'Unpin':'Pin'}">Pin</button>
+ <button class="icon-btn" onclick="openModal(${e.id})">Edit</button>
+ <button class="icon-btn del" onclick="deleteEntry(${e.id})">Del</button>
+ </div>
+ </div>
+ ${e.tag?`<span class="card-tag" onclick="jumpToCategory('${esc(e.tag)}')">${esc(e.tag)}</span>`:''}
+ ${e.url?`<div class="card-link"><a href="${esc(e.url)}" target="_blank" rel="noopener"> ${esc(e.url)}</a></div>`:''}
+ ${e.comment?`<div class="card-comment">${esc(e.comment)}</div>`:''}
+ ${e.ps?`<div class="card-ps"><div class="card-ps-label"> ${currentOs==='win'?'PowerShell':'Shell'}</div><button class="copy-btn" onclick="copyPs(this,${e.id})">copy</button><code>${esc(e.ps)}</code></div>`:''}
+ </div>`;
+}
+
+function jumpToCategory(tag) { selCat = tag; switchTab('cat'); }
+
+/* ════════════════════════════════════════════════
+ KATEGORIEN
+════════════════════════════════════════════════ */
+function allTags() {
+ const map = {};
+ getEntries().forEach(e => { const t=(e.tag||'').trim(); if(t) map[t]=(map[t]||0)+1; });
+ return map;
+}
+function safeId(s) { return s.replace(/[^a-zA-Z0-9]/g,c=>'_'+c.charCodeAt(0)+'_'); }
+
+/* ── Category order ── */
+function getCatOrderKey() { return 'cat_order_' + currentOs; }
+function getCatOrder() {
+  try { return JSON.parse(localStorage.getItem(getCatOrderKey()) || '[]'); } catch(e) { return []; }
+}
+function saveCatOrder(order) {
+  localStorage.setItem(getCatOrderKey(), JSON.stringify(order));
+  pbSet(getCatOrderKey(), order);
+}
+function getOrderedTags(map) {
+  const stored = getCatOrder();
+  const allKeys = Object.keys(map);
+  const ordered = stored.filter(t => allKeys.includes(t));
+  const extra = allKeys.filter(t => !ordered.includes(t)).sort((a,b) => a.localeCompare(b,'de'));
+  return [...ordered, ...extra];
+}
+function moveCat(event, tag, dir) {
+  event.stopPropagation();
+  const map = allTags();
+  const tags = getOrderedTags(map);
+  const idx = tags.indexOf(tag);
+  if (idx === -1) return;
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= tags.length) return;
+  tags.splice(idx, 1);
+  tags.splice(newIdx, 0, tag);
+  saveCatOrder(tags);
+  renderCatSidebar();
+}
+
+function renderCatSidebar() {
+  const map = allTags();
+  const tags = getOrderedTags(map);
+  document.getElementById('tagSuggestions').innerHTML = tags.map(t=>`<option value="${esc(t)}">`).join('');
+  const list = document.getElementById('catList');
+  if (!tags.length) {
+    list.innerHTML = `<div style="padding:18px;color:var(--muted);font-size:0.8rem;text-align:center;">No categories yet.<br>Assign a tag to a program.</div>`;
+    renderCatContent(); return;
+  }
+  list.innerHTML = tags.map((tag, idx) => {
+    const sid = safeId(tag), sel = tag === selCat ? ' selected' : '';
+    const first = idx === 0, last = idx === tags.length - 1;
+    return `<div class="cat-item${sel}" onclick="selectCat('${esc(tag)}')">
+      <div class="cat-move-btns" onclick="event.stopPropagation()">
+        <button class="cat-move-btn" onclick="moveCat(event,'${esc(tag)}',-1)" ${first?'disabled':''} title="Move up">&#9650;</button>
+        <button class="cat-move-btn" onclick="moveCat(event,'${esc(tag)}',1)"  ${last?'disabled':''} title="Move down">&#9660;</button>
+      </div>
+      <span class="cat-item-name" id="cn_${sid}">${esc(tag)}</span>
+      <span class="cat-item-count">${map[tag]}</span>
+      <div class="cat-item-btns">
+        <button class="cat-btn" onclick="startRename(event,'${esc(tag)}')">Rename</button>
+        <button class="cat-btn del" onclick="deleteCategory(event,'${esc(tag)}')">Del</button>
+      </div>
+    </div>`;
+  }).join('');
+  renderCatContent();
+}
+
+function selectCat(tag) { selCat=tag; renderCatSidebar(); }
+
+function renderCatContent() {
+ const content = document.getElementById('catContent');
+ if (!selCat) { content.innerHTML=`<div class="cat-placeholder"><p>Select a category on the left.</p></div>`; return; }
+ const q = document.getElementById('searchInput').value.toLowerCase();
+ const apps = getEntries().filter(e=>(e.tag||'').trim()===selCat&&(!q||[e.name,e.url,e.comment,e.ps].some(v=>v&&v.toLowerCase().includes(q))));
+ content.innerHTML = `
+ <div class="cat-content-header">
+ <div class="cat-content-title"><span>//</span>${esc(selCat)}</div>
+ <span style="font-family:'IBM Plex Mono',monospace;font-size:0.72rem;color:var(--muted)">${apps.length} app${apps.length!==1?'s':''}</span>
+ </div>
+ ${apps.length?apps.map(appRowHtml).join(''):`<div class="cat-placeholder" style="padding:40px 0"><p>No entries.</p></div>`}`;
+}
+
+function appRowHtml(e) {
+ const iconHtml = e.icon
+ ? (e.icon.startsWith('data:') || e.icon.startsWith('http') || e.icon.startsWith('/')
+ ? `<img class="app-row-icon" src="${esc(e.icon)}" alt="" onerror="this.style.display='none'" />`
+ : `<div class="app-row-icon-placeholder">${esc(e.icon)}</div>`)
+ : '';
+ return `<div class="app-row">
+ ${iconHtml}
+ <div class="app-row-info">
+ <div class="app-row-name">${esc(e.name)}</div>
+ ${e.url?`<div class="app-row-link"><a href="${esc(e.url)}" target="_blank" rel="noopener"> ${esc(e.url)}</a></div>`:''}
+ ${e.comment?`<div class="app-row-comment">${esc(e.comment)}</div>`:''}
+ ${e.ps?`<div class="app-row-ps"><button class="copy-btn" onclick="copyPs(this,${e.id})">copy</button> ${esc(e.ps)}</div>`:''}
+ </div>
+ <div class="app-row-actions">
+ <button class="icon-btn" onclick="openModal(${e.id})">Edit</button>
+ <button class="icon-btn del" onclick="deleteEntry(${e.id})">Del</button>
+ </div>
+ </div>`;
+}
+
+function addCategory() {
+ const input=document.getElementById('newCatInput'), name=input.value.trim();
+ if (!name) return;
+ input.value=''; selCat=name; openModal(null,name);
+}
+
+function startRename(evt,tag) {
+ evt.stopPropagation();
+ const sid=safeId(tag), el=document.getElementById('cn_'+sid); if(!el) return;
+ const input=document.createElement('input'); input.className='cat-rename-input'; input.value=tag;
+ el.replaceWith(input); input.focus(); input.select();
+ input.onblur=()=>commitRename(tag,input.value.trim());
+ input.onkeydown=ev=>{if(ev.key==='Enter')input.blur();if(ev.key==='Escape'){input.value=tag;input.blur();}};
+}
+function commitRename(oldTag,newTag) {
+ if(!newTag||newTag===oldTag){renderCatSidebar();return;}
+ getEntries().forEach(e=>{if((e.tag||'').trim()===oldTag)e.tag=newTag;});
+ if(selCat===oldTag)selCat=newTag;
+ const ord=getCatOrder().map(t=>t===oldTag?newTag:t); saveCatOrder(ord);
+  saveEntries(); renderCatSidebar(); renderCards();
+}
+function deleteCategory(evt,tag) {
+ evt.stopPropagation();
+ const count=getEntries().filter(e=>(e.tag||'').trim()===tag).length;
+ if(!confirm(`Category "${tag}" löschen?\n\nThe tag will be removed from ${count} app${count!==1?'s':''} entfernt.`))return;
+ getEntries().forEach(e=>{if((e.tag||'').trim()===tag)e.tag='';});
+ if(selCat===tag)selCat=null;
+  saveCatOrder(getCatOrder().filter(t=>t!==tag));
+ saveEntries(); renderCatSidebar(); renderCards();
+}
+
+/* ════════════════════════════════════════════════
+ ENTRY MODAL
+════════════════════════════════════════════════ */
+function openModal(id=null,presetTag=null) {
+ editId=id;
+ const e=id!==null?getEntries().find(x=>x.id===id):null;
+ document.getElementById('modalTitle').textContent=id!==null?'// Edit':'// Neues Program';
+ document.getElementById('fName').value = e?.name || '';
+ document.getElementById('fUrl').value = e?.url || '';
+ document.getElementById('fTag').value = e?.tag || presetTag || (currentTab==='cat'&&selCat?selCat:'') || '';
+ document.getElementById('fComment').value = e?.comment || '';
+ document.getElementById('fPs').value = e?.ps || '';
+ // icon
+ const icon = e?.icon || '';
+ document.getElementById('fIconFile').value = '';
+ document.getElementById('fIconEmoji').value = '';
+ document.getElementById('fIconUrl').value = '';
+ updateIconPreview(icon);
+ document.getElementById('overlay').classList.add('open');
+ setTimeout(()=>document.getElementById('fName').focus(),50);
+}
+function closeModal() { document.getElementById('overlay').classList.remove('open'); editId=null; }
+
+function saveEntry() {
+ const name=document.getElementById('fName').value.trim();
+ if(!name){alert('Please enter a name.');return;}
+ const iconEl = document.getElementById('iconPreviewWrap');
+ const icon = iconEl.dataset.icon || '';
+ const data={id:editId??Date.now(),name,url:document.getElementById('fUrl').value.trim(),tag:document.getElementById('fTag').value.trim(),comment:document.getElementById('fComment').value.trim(),ps:document.getElementById('fPs').value.trim(),icon};
+ const entries=getEntries();
+ if(editId!==null){const idx=entries.findIndex(e=>e.id===editId);entries[idx]=data;}
+ else{entries.unshift(data);}
+ const _isEdit = editId !== null;
+ const _name = document.getElementById('fName').value.trim();
+ const _tag = document.getElementById('fTag').value.trim();
+ saveEntries(); closeModal(); renderCards();
+ if(currentTab==='cat')renderCatSidebar();
+ document.dispatchEvent(new CustomEvent('saveEntryDone',{detail:{isEdit:_isEdit,name:_name,tag:_tag}}));
+}
+function deleteEntry(id) {
+ if(!confirm('Really delete this entry?'))return;
+ const _e=getEntries().find(x=>x.id===id);
+ setEntries(getEntries().filter(e=>e.id!==id));
+ saveEntries(); renderCards();
+ if(currentTab==='cat')renderCatSidebar();
+ if(_e) document.dispatchEvent(new CustomEvent('deleteEntryDone',{detail:{name:_e.name,tag:_e.tag||''}}));
+}
+
+/* ════════════════════════════════════════════════
+ SETUP TODO DATA
+════════════════════════════════════════════════ */
+const DEFAULT_WIN=[
+ {id:'s1',title:'Basic Settings',open:true,items:[
+ {id:'i101',label:'Install Windows Updates',done:false,note:'Einstellungen → Windows Update',ps:'Install-Module PSWindowsUpdate -Force; Get-WindowsUpdate -Install -AcceptAll'},
+ {id:'i102',label:'Configure power options',done:false,note:'Control Panel → High Performance',ps:'powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'},
+ {id:'i103',label:'Set computer name',done:false,note:'Settings → System → About',ps:'Rename-Computer -NewName "MeinPC" -Restart'},
+ {id:'i104',label:'Set timezone & time',done:false,note:'Settings → Time & Language',ps:'Set-TimeZone -Id "W. Europe Standard Time"'},
+ {id:'i105',label:'Configure privacy settings',done:false,note:'Settings → Privacy &Security',ps:''},
+ {id:'i106',label:'Autostart-Programs bereinigen',done:false,note:'Task Manager → Startup',ps:''},
+ ]},
+ {id:'s2',title:'Drivers',open:false,items:[
+ {id:'i201',label:'Install GPU drivers',done:false,note:'NVIDIA / AMD / Intel',ps:'winget install --id NVIDIA.GeForceExperience'},
+ {id:'i202',label:'Install chipset drivers',done:false,note:'From motherboard manufacturer website',ps:''},
+ {id:'i203',label:'Install audio drivers',done:false,note:'Realtek or vendor-specific',ps:''},
+ {id:'i204',label:'Check network / WiFi drivers',done:false,note:'Device Manager →Network Adapters',ps:''},
+ ]},
+ {id:'s3',title:'Security',open:false,items:[
+ {id:'i301',label:'Enable Windows Defender',done:false,note:'Settings → WindowsSecurity',ps:'Set-MpPreference -DisableRealtimeMonitoring $false'},
+ {id:'i302',label:'Configure firewall',done:false,note:'WindowsSecurity → Firewall',ps:'Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True'},
+ {id:'i303',label:'Enable BitLocker (optional)',done:false,note:'Control Panel → BitLocker',ps:'Enable-BitLocker -MountPoint "C:" -RecoveryPasswordProtector'},
+ {id:'i304',label:'Enable automatic updates',done:false,note:'',ps:''},
+ ]},
+ {id:'s4',title:'Install Software',open:false,items:[
+ {id:'i401',label:'Install browser',done:false,note:'e.g. Firefox or Chrome',ps:'winget install --id Mozilla.Firefox'},
+ {id:'i402',label:'Install 7-Zip',done:false,note:'',ps:'winget install --id 7zip.7zip'},
+ {id:'i403',label:'Install VLC Media Player',done:false,note:'',ps:'winget install --id VideoLAN.VLC'},
+ {id:'i404',label:'Install LibreOffice',done:false,note:'',ps:'winget install --id TheDocumentFoundation.LibreOffice'},
+ {id:'i405',label:'Install Visual Studio Code',done:false,note:'',ps:'winget install --id Microsoft.VisualStudioCode'},
+ {id:'i406',label:'Install PowerShell 7',done:false,note:'',ps:'winget install --id Microsoft.PowerShell'},
+ ]},
+ {id:'s5',title:'Network',open:false,items:[
+ {id:'i501',label:'Configure network shares',done:false,note:'Einstellungen → Netzwerk & Internet',ps:''},
+ {id:'i502',label:'Set DNS server',done:false,note:'e.g. 1.1.1.1 / 8.8.8.8',ps:'Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses ("1.1.1.1","8.8.8.8")'},
+ {id:'i503',label:'Set up VPN client (if needed)',done:false,note:'',ps:''},
+ ]},
+ {id:'s6',title:'Personalization',open:false,items:[
+ {id:'i601',label:'Set wallpaper & lock screen',done:false,note:'',ps:''},
+ {id:'i602',label:'Customize taskbar',done:false,note:'',ps:''},
+ {id:'i603',label:'Enable Dark Mode',done:false,note:'',ps:"Set-ItemProperty -Path HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize -Name appsUseLightTheme -Value 0"},
+ {id:'i604',label:'Set font size / scaling',done:false,note:'',ps:''},
+ ]},
+ {id:'s7',title:'Backup & Recovery',open:false,items:[
+ {id:'i701',label:'Create restore point',done:false,note:'',ps:'Checkpoint-Computer -Description "Nach Erstinstallation" -RestorePointType "MODIFY_SETTINGS"'},
+ {id:'i702',label:'Set up backup solution',done:false,note:'Windows Backup or external solution',ps:''},
+ ]},
+];
+
+const DEFAULT_LIN=[
+ {id:'l1',title:'Basic Settings',open:true,items:[
+ {id:'l101',label:'Install system updates',done:false,note:'Update package sources',ps:'sudo apt update && sudo apt upgrade -y'},
+ {id:'l102',label:'Set hostname',done:false,note:'',ps:'sudo hostnamectl set-hostname meinpc'},
+ {id:'l103',label:'Set timezone',done:false,note:'',ps:'sudo timedatectl set-timezone Europe/Berlin'},
+ {id:'l104',label:'Set keyboard layout',done:false,note:'',ps:'sudo localectl set-keymap de'},
+ {id:'l105',label:'Create new user',done:false,note:'',ps:'sudo adduser benutzername && sudo usermod -aG sudo benutzername'},
+ ]},
+ {id:'l2',title:'Drivers',open:false,items:[
+ {id:'l201',label:'Install NVIDIA drivers',done:false,note:'For Ubuntu/Debian',ps:'sudo ubuntu-drivers autoinstall'},
+ {id:'l202',label:'AMD drivers (Mesa)',done:false,note:'',ps:'sudo apt install mesa-utils -y'},
+ {id:'l203',label:'Printer drivers (CUPS)',done:false,note:'',ps:'sudo apt install cups -y && sudo systemctl enable cups'},
+ {id:'l204',label:'Set up Bluetooth',done:false,note:'',ps:'sudo apt install bluetooth bluez -y && sudo systemctl enable bluetooth'},
+ ]},
+ {id:'l3',title:'Security',open:false,items:[
+ {id:'l301',label:'Enable UFW Firewall',done:false,note:'',ps:'sudo ufw enable && sudo ufw status'},
+ {id:'l302',label:'Secure SSH',done:false,note:'Disable root login',ps:'sudo sed -i "s/#PermitRootLogin prohibit-password/PermitRootLogin no/" /etc/ssh/sshd_config && sudo systemctl restart ssh'},
+ {id:'l303',label:'Install Fail2ban',done:false,note:'',ps:'sudo apt install fail2ban -y && sudo systemctl enable fail2ban'},
+ {id:'l304',label:'Automatic security updates',done:false,note:'',ps:'sudo apt install unattended-upgrades -y && sudo dpkg-reconfigure unattended-upgrades'},
+ ]},
+ {id:'l4',title:'Install Software',open:false,items:[
+ {id:'l401',label:'Install browser',done:false,note:'Firefox or Chromium',ps:'sudo apt install firefox -y'},
+ {id:'l402',label:'Install curl & wget',done:false,note:'',ps:'sudo apt install curl wget -y'},
+ {id:'l403',label:'Install git',done:false,note:'',ps:'sudo apt install git -y'},
+ {id:'l404',label:'Install VLC Media Player',done:false,note:'',ps:'sudo apt install vlc -y'},
+ {id:'l405',label:'Install Visual Studio Code',done:false,note:'',ps:'sudo snap install code --classic'},
+ {id:'l406',label:'htop & net-tools',done:false,note:'',ps:'sudo apt install htop net-tools -y'},
+ ]},
+ {id:'l5',title:'Network',open:false,items:[
+ {id:'l501',label:'Set static IP (optional)',done:false,note:'Via Netplan orNetworkManager',ps:''},
+ {id:'l502',label:'Configure DNS server',done:false,note:'',ps:"echo 'nameserver 1.1.1.1\\nnameserver 8.8.8.8' | sudo tee /etc/resolv.conf"},
+ {id:'l503',label:'Test SSH access',done:false,note:'',ps:'sudo systemctl status ssh'},
+ {id:'l504',label:'Samba for Windows shares (optional)',done:false,note:'',ps:'sudo apt install samba -y'},
+ ]},
+ {id:'l6',title:' Desktop &Personalization',open:false,items:[
+ {id:'l601',label:'Install GNOME Tweaks',done:false,note:'',ps:'sudo apt install gnome-tweaks -y'},
+ {id:'l602',label:'Install fonts',done:false,note:'',ps:'sudo apt install fonts-noto fonts-firacode -y'},
+ {id:'l603',label:'Enable dark theme',done:false,note:'',ps:"gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'"},
+ {id:'l604',label:'Enable Flatpak (optional)',done:false,note:'',ps:'sudo apt install flatpak -y && flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo'},
+ ]},
+ {id:'l7',title:'Backup & Maintenance',open:false,items:[
+ {id:'l701',label:'Set up Timeshift for snapshots',done:false,note:'',ps:'sudo apt install timeshift -y'},
+ {id:'l702',label:'Cron job for updates',done:false,note:'',ps:"(crontab -l 2>/dev/null; echo '0 3 * * 0 apt update && apt upgrade -y') | crontab -"},
+ {id:'l703',label:'Clean up logs',done:false,note:'',ps:'sudo journalctl --vacuum-time=30d'},
+ ]},
+];
+
+let todosWin = JSON.parse(localStorage.getItem(SK_TWIN)||'null') || JSON.parse(JSON.stringify(DEFAULT_WIN));
+let todosLin = JSON.parse(localStorage.getItem(SK_TLIN)||'null') || JSON.parse(JSON.stringify(DEFAULT_LIN));
+function getTodos() { return currentOs==='win'?todosWin:todosLin; }
+function setTodos(arr) { if(currentOs==='win')todosWin=arr;else todosLin=arr; }
+function saveTodos() { localStorage.setItem(SK_TWIN,JSON.stringify(todosWin)); localStorage.setItem(SK_TLIN,JSON.stringify(todosLin)); pbSet(SK_TWIN,todosWin); pbSet(SK_TLIN,todosLin); }
+
+/* ════════════════════════════════════════════════
+ SETUP TODO RENDER
+════════════════════════════════════════════════ */
+function renderTodos() {
+ const todos=getTodos(), container=document.getElementById('todoOsContent');
+ let total=0,done=0;
+ todos.forEach(s=>s.items.forEach(i=>{total++;if(i.done)done++;}));
+ const pct=total?Math.round(done/total*100):0;
+ const label=currentOs==='win'?' Windows Setup':' Linux Setup';
+ const cmd=currentOs==='win'?'PowerShell':'Shell Command';
+ container.innerHTML=`
+ <div class="todo-header">
+ <div class="todo-title"><span>//</span>${label} – ToDo</div>
+ <div class="todo-header-actions">
+ <button class="btn btn-ghost btn-sm" onclick="resetAllTodos()">↺Reset</button>
+ <button class="btn btn-ghost btn-sm" onclick="openTemplates()">Templates</button>
+ <button class="btn btn-primary btn-sm" onclick="focusNewSection()">+ Section</button>
+ </div>
+ </div>
+ <div class="todo-progress-label"><span>Overall Progress</span><strong>${done} / ${total}</strong></div>
+ <div class="todo-progress-bar-wrap"><div class="todo-progress-bar-fill" style="width:${pct}%"></div></div>
+ <div id="todoSections">${todos.map(s=>sectionHtml(s)).join('')}</div>
+ <div class="todo-add-section" style="margin-top:14px;">
+ <input type="text" id="newSectionInput" placeholder="Add new section …" onkeydown="if(event.key==='Enter')addTodoSection()" />
+ <button class="btn btn-ghost btn-sm" onclick="addTodoSection()">+ Section</button>
+ </div>`;
+}
+
+function sectionHtml(sec) {
+ const sd=sec.items.filter(i=>i.done).length, st=sec.items.length;
+ const sp=st?Math.round(sd/st*100):0, ad=st>0&&sd===st;
+ return `<div class="todo-section${sec.open?' open':''}" id="sec_${sec.id}">
+ <div class="todo-section-header" onclick="toggleSection('${sec.id}')">
+ <span class="todo-section-chevron">▶</span>
+ <span class="todo-section-title">${esc(sec.title)}</span>
+ <div class="todo-section-mini-bar"><div class="todo-section-mini-fill${ad?' done':''}" style="width:${sp}%"></div></div>
+ <span class="todo-section-prog${ad?' done':''}">${sd}/${st}</span>
+ <div class="todo-section-actions" onclick="event.stopPropagation()">
+ <button class="icon-btn" onclick="openRenameSec('${sec.id}')">Edit</button>
+ <button class="icon-btn del" onclick="deleteTodoSec('${sec.id}')">Del</button>
+ </div>
+ </div>
+ ${sec.open?`<div class="todo-items">
+ ${sec.items.map(item=>itemHtml(item,sec.id)).join('')}
+ <div class="todo-add-row">
+ <input type="text" placeholder="+ Task …" onkeydown="if(event.key==='Enter')quickAddItem('${sec.id}',this)" />
+ <button class="btn btn-ghost btn-sm" onclick="openAddTodoItem('${sec.id}')">+ Detail</button>
+ </div>
+ </div>`:''}
+ </div>`;
+}
+
+function itemHtml(item,secId) {
+ return `<div class="todo-item${item.done?' checked':''}">
+ <input type="checkbox" class="todo-checkbox" ${item.done?'checked':''} onchange="toggleItem('${secId}','${item.id}',this.checked)" />
+ <div class="todo-item-body">
+ <div class="todo-item-label">${esc(item.label)}</div>
+ ${item.note?`<div class="todo-item-note">${esc(item.note)}</div>`:''}
+ ${item.ps?`<div class="todo-item-ps"><button class="copy-btn" onclick="copyTodoPs(this,'${item.id}','${secId}')">copy</button> ${esc(item.ps)}</div>`:''}
+ </div>
+ <div class="todo-item-actions">
+ <button class="icon-btn" onclick="openEditTodoItem('${secId}','${item.id}')">Edit</button>
+ <button class="icon-btn del" onclick="deleteTodoItem('${secId}','${item.id}')">Del</button>
+ </div>
+ </div>`;
+}
+
+function toggleSection(id) { const t=getTodos(),s=t.find(x=>x.id===id); if(s)s.open=!s.open; saveTodos(); renderTodos(); }
+function toggleItem(secId,itemId,checked) { const s=getTodos().find(x=>x.id===secId); if(s){const i=s.items.find(x=>x.id===itemId);if(i)i.done=checked;} saveTodos(); renderTodos(); }
+function quickAddItem(secId,input) { const l=input.value.trim(); if(!l)return; const s=getTodos().find(x=>x.id===secId); if(s){s.items.push({id:'i'+Date.now(),label:l,done:false,note:'',ps:''});input.value='';} saveTodos(); renderTodos(); }
+function addTodoSection() { const input=document.getElementById('newSectionInput'),t=input.value.trim(); if(!t)return; getTodos().push({id:'s'+Date.now(),title:t,open:true,items:[]}); input.value=''; saveTodos(); renderTodos(); }
+function deleteTodoSec(id) { const t=getTodos(),s=t.find(x=>x.id===id); if(!s||!confirm(`Section "${s.title}" löschen?`))return; setTodos(t.filter(x=>x.id!==id)); saveTodos(); renderTodos(); }
+function resetAllTodos() { if(!confirm('Remove all checkmarks?'))return; getTodos().forEach(s=>s.items.forEach(i=>i.done=false)); saveTodos(); renderTodos(); }
+function focusNewSection() { const el=document.getElementById('newSectionInput'); if(el){el.focus();el.scrollIntoView({behavior:'smooth'});} }
+
+function openRenameSec(id) { const s=getTodos().find(x=>x.id===id); if(!s)return; editTodoSec=id; document.getElementById('tSecName').value=s.title; document.getElementById('todoSecOverlay').classList.add('open'); setTimeout(()=>document.getElementById('tSecName').focus(),50); }
+function closeTodoSecModal() { document.getElementById('todoSecOverlay').classList.remove('open'); editTodoSec=null; }
+function saveTodoSection() { const n=document.getElementById('tSecName').value.trim(); if(!n)return; const s=getTodos().find(x=>x.id===editTodoSec); if(s)s.title=n; saveTodos(); closeTodoSecModal(); renderTodos(); }
+
+function openAddTodoItem(secId) { addToSecId=secId; editTodoItem=null; document.getElementById('todoItemModalTitle').textContent='// Add Task'; document.getElementById('tLabel').value=''; document.getElementById('tNote').value=''; document.getElementById('tPs').value=''; document.getElementById('todoItemOverlay').classList.add('open'); setTimeout(()=>document.getElementById('tLabel').focus(),50); }
+function openEditTodoItem(secId,itemId) { const s=getTodos().find(x=>x.id===secId),item=s?.items.find(x=>x.id===itemId); if(!item)return; addToSecId=secId; editTodoItem={secId,itemId}; document.getElementById('todoItemModalTitle').textContent='// Edit Task'; document.getElementById('tLabel').value=item.label; document.getElementById('tNote').value=item.note||''; document.getElementById('tPs').value=item.ps||''; document.getElementById('todoItemOverlay').classList.add('open'); setTimeout(()=>document.getElementById('tLabel').focus(),50); }
+function closeTodoItemModal() { document.getElementById('todoItemOverlay').classList.remove('open'); editTodoItem=null; }
+function saveTodoItem() { const l=document.getElementById('tLabel').value.trim(); if(!l){alert('Please enter a task.');return;} const s=getTodos().find(x=>x.id===addToSecId); if(!s)return; if(editTodoItem){const i=s.items.find(x=>x.id===editTodoItem.itemId);if(i){i.label=l;i.note=document.getElementById('tNote').value.trim();i.ps=document.getElementById('tPs').value.trim();}}else{s.items.push({id:'i'+Date.now(),label:l,done:false,note:document.getElementById('tNote').value.trim(),ps:document.getElementById('tPs').value.trim()});} saveTodos(); closeTodoItemModal(); renderTodos(); }
+function deleteTodoItem(secId,itemId) { if(!confirm('Delete task?'))return; const s=getTodos().find(x=>x.id===secId); if(s)s.items=s.items.filter(x=>x.id!==itemId); saveTodos(); renderTodos(); }
+
+/* ════════════════════════════════════════════════
+ UTILS
+════════════════════════════════════════════════ */
+
+
+/* ════════════════════════════════════════════════
+ DATEIEN
+════════════════════════════════════════════════ */
+const SK_FWIN = 'files_win_v1';
+const SK_FLIN = 'files_lin_v1';
+let filesWin = JSON.parse(localStorage.getItem(SK_FWIN) || '[]');
+let filesLin = JSON.parse(localStorage.getItem(SK_FLIN) || '[]');
+let editFileId = null;
+let fileView = 'grid';
+let fileFilter = 'all';
+let pendingFile = null; // { name, data, type, size }
+
+function getFiles() { return currentOs === 'win' ? filesWin : filesLin; }
+function setFiles(arr) { if (currentOs === 'win') filesWin = arr; else filesLin = arr; }
+function saveFiles() { localStorage.setItem(SK_FWIN, JSON.stringify(filesWin)); localStorage.setItem(SK_FLIN, JSON.stringify(filesLin)); pbSet(SK_FWIN,filesWin); pbSet(SK_FLIN,filesLin); }
+
+function fileTypeIcon(f) {
+ const ext = (f.path || f.name || '').split('.').pop().toLowerCase();
+ const m = {
+ pdf:'', doc:'', docx:'', xls:'', xlsx:'', ppt:'', pptx:'',
+ txt:'', md:'', log:'', csv:'',
+ ps1:'', sh:'', bat:'', cmd:'', py:'', js:'', ts:'', html:'', css:'', json:'', xml:'', yaml:'', yml:'',
+ zip:'', rar:'', '7z':'', tar:'', gz:'',
+ exe:'', msi:'', deb:'', rpm:'', appimage:'',
+ png:'', jpg:'', jpeg:'', gif:'', svg:'', webp:'', ico:'',
+ mp4:'', mkv:'', avi:'', mov:'', mp3:'', wav:'', flac:'',
+ iso:'', img:'', vmdk:'',
+ };
+ return m[ext] || '';
+}
+
+function fileTypeName(f) {
+ const ext = (f.path || f.name || '').split('.').pop().toLowerCase();
+ if (!ext || ext === f.name) return 'File';
+ return ext.toUpperCase();
+}
+
+function fileSizeLabel(bytes) {
+ if (!bytes) return '';
+ if (bytes < 1024) return bytes + ' B';
+ if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+ return (bytes/1024/1024).toFixed(1) + ' MB';
+}
+
+function allFileTags() {
+ const s = new Set();
+ getFiles().forEach(f => { if (f.tag) s.add(f.tag.trim()); });
+ return [...s].sort();
+}
+
+function setFileView(v) {
+ fileView = v;
+ document.getElementById('viewGrid').classList.toggle('active', v === 'grid');
+ document.getElementById('viewList').classList.toggle('active', v === 'list');
+ document.getElementById('filesGrid').style.display = v === 'grid' ? 'grid' : 'none';
+ document.getElementById('filesList').style.display = v === 'list' ? 'flex' : 'none';
+ renderFiles();
+}
+
+function renderFiles() {
+ const files = getFiles();
+ const tags = allFileTags();
+
+ // Badge
+ document.getElementById('filesBadge').innerHTML = `<strong>${files.length}</strong> File${files.length !== 1 ? 'en' : ''}`;
+
+ // Tag suggestions
+ document.getElementById('fileTagSuggestions').innerHTML = tags.map(t => `<option value="${esc(t)}">`).join('');
+
+ // Filter pills
+ const pills = [{ id:'all', label:'Alle' }, ...tags.map(t => ({ id:t, label:t }))];
+ document.getElementById('fileFilters').innerHTML = pills.map(p =>
+ `<span class="filter-pill${fileFilter===p.id?' active':''}" onclick="setFileFilter('${esc(p.id)}')">${esc(p.label)}</span>`
+ ).join('');
+
+ // Filter & search
+ const q = ''; // files tab hides search, no filter by search here
+ const filtered = files.filter(f =>
+ (fileFilter === 'all' || (f.tag||'').trim() === fileFilter)
+ );
+
+ const emptyEl = document.getElementById('emptyFiles');
+ if (!filtered.length) {
+ document.getElementById('filesGrid').innerHTML = '';
+ document.getElementById('filesList').innerHTML = '';
+ emptyEl.style.display = 'block';
+ return;
+ }
+ emptyEl.style.display = 'none';
+
+ if (fileView === 'grid') {
+ document.getElementById('filesGrid').innerHTML = filtered.map(fileCardHtml).join('');
+ } else {
+ document.getElementById('filesList').innerHTML = filtered.map(fileRowHtml).join('');
+ }
+}
+
+function setFileFilter(tag) { fileFilter = tag; renderFiles(); }
+
+function fileCardHtml(f) {
+ const icon = f.data
+ ? (f.mimeType && f.mimeType.startsWith('image/')
+ ? `<img class="file-thumb" src="${f.data}" alt="" />`
+ : `<div class="file-type-icon">${fileTypeIcon(f)}</div>`)
+ : `<div class="file-type-icon">${fileTypeIcon(f)}</div>`;
+ const meta = [fileTypeName(f), fileSizeLabel(f.size)].filter(Boolean).join(' · ');
+ return `<div class="file-card">
+ <div class="file-card-actions">
+ <button class="icon-btn" onclick="openFileModal(${f.id})" title="Edit">Edit</button>
+ <button class="icon-btn del" onclick="deleteFile(${f.id})" title="Delete">Del</button>
+ </div>
+ ${icon}
+ <div class="file-card-name">${esc(f.name)}</div>
+ ${f.tag ? `<span class="file-card-tag">${esc(f.tag)}</span>` : ''}
+ ${meta ? `<div class="file-card-meta">${esc(meta)}</div>` : ''}
+ ${f.desc ? `<div class="file-card-desc">${esc(f.desc)}</div>` : ''}
+ ${f.path ? `<div class="file-card-path"> ${esc(f.path)}</div>` : ''}
+ <div class="file-card-btns-bottom">
+ ${f.path ? `<button class="file-action-btn" onclick="copyFilePath(this,${f.id})" title="Path kopieren">Path</button>` : ''}
+ ${f.data ? `<a class="file-action-btn" href="${f.data}" download="${esc(f.originalName||f.name)}" style="text-decoration:none">⬇Download</a>` : ''}
+ ${f.path && (f.path.startsWith('http')||f.path.startsWith('file:')) ? `<a class="file-action-btn" href="${esc(f.path)}" target="_blank" rel="noopener" style="text-decoration:none"> Öffnen</a>` : ''}
+ </div>
+ </div>`;
+}
+
+function fileRowHtml(f) {
+ const iconHtml = f.data && f.mimeType && f.mimeType.startsWith('image/')
+ ? `<img class="file-row-thumb" src="${f.data}" alt="" />`
+ : `<div class="file-row-icon">${fileTypeIcon(f)}</div>`;
+ const meta = [fileTypeName(f), fileSizeLabel(f.size)].filter(Boolean).join(' · ');
+ return `<div class="file-row">
+ ${iconHtml}
+ <div class="file-row-info">
+ <div class="file-row-name">${esc(f.name)}</div>
+ ${f.path ? `<div class="file-row-path"> ${esc(f.path)}</div>` : ''}
+ ${f.desc ? `<div class="file-row-desc">${esc(f.desc)}</div>` : ''}
+ ${f.tag ? `<span class="file-row-tag">${esc(f.tag)}</span>` : ''}
+ ${meta ? `<div class="file-card-meta" style="margin-top:2px">${esc(meta)}</div>` : ''}
+ </div>
+ <div class="file-row-actions">
+ ${f.path ? `<button class="file-action-btn" onclick="copyFilePath(this,${f.id})">Path</button>` : ''}
+ ${f.data ? `<a class="file-action-btn" href="${f.data}" download="${esc(f.originalName||f.name)}" style="text-decoration:none">⬇</a>` : ''}
+ ${f.path && (f.path.startsWith('http')||f.path.startsWith('file:')) ? `<a class="file-action-btn" href="${esc(f.path)}" target="_blank" rel="noopener" style="text-decoration:none"></a>` : ''}
+ <button class="icon-btn" onclick="openFileModal(${f.id})" title="Edit">Edit</button>
+ <button class="icon-btn del" onclick="deleteFile(${f.id})" title="Delete">Del</button>
+ </div>
+ </div>`;
+}
+
+function copyFilePath(btn, id) {
+ const f = getFiles().find(x => x.id === id);
+ if (!f?.path) return;
+ navigator.clipboard.writeText(f.path).then(() => {
+ btn.textContent = ' copied'; btn.classList.add('copied');
+ setTimeout(() => { btn.textContent = 'Path'; btn.classList.remove('copied'); }, 1600);
+ });
+}
+
+/* ── File Modal ── */
+function openFileModal(id = null) {
+ editFileId = id;
+ pendingFile = null;
+ const f = id !== null ? getFiles().find(x => x.id === id) : null;
+ document.getElementById('fileModalTitle').textContent = id !== null ? '// Edit File' : '// Add File';
+ document.getElementById('ffName').value = f?.name || '';
+ document.getElementById('ffPath').value = f?.path || '';
+ document.getElementById('ffTag').value = f?.tag || '';
+ document.getElementById('ffDesc').value = f?.desc || '';
+ resetDropZone(f);
+ document.getElementById('fileOverlay').classList.add('open');
+ setTimeout(() => document.getElementById('ffName').focus(), 50);
+}
+
+function resetDropZone(f) {
+ const label = document.getElementById('dropZoneLabel');
+ if (f?.originalName) {
+ label.textContent = ' ' + f.originalName + (f.size ? ' (' + fileSizeLabel(f.size) + ')' : '');
+ } else {
+ label.textContent = 'Click or drag file here';
+ }
+ document.getElementById('ffUpload').value = '';
+}
+
+function closeFileModal() {
+ document.getElementById('fileOverlay').classList.remove('open');
+ editFileId = null; pendingFile = null;
+}
+
+function onFileUpload(input) {
+ const file = input.files[0]; if (!file) return;
+ readFileForStorage(file);
+}
+function onFileDrop(event) {
+ event.preventDefault();
+ document.getElementById('fileDropZone').classList.remove('drag-over');
+ const file = event.dataTransfer.files[0]; if (!file) return;
+ readFileForStorage(file);
+}
+function readFileForStorage(file) {
+ const label = document.getElementById('dropZoneLabel');
+ label.textContent = '⏳ Reading …';
+ // Auto-fill name if empty
+ if (!document.getElementById('ffName').value.trim()) {
+ document.getElementById('ffName').value = file.name.replace(/\.[^.]+$/, '');
+ }
+ // Auto-fill path hint
+ if (!document.getElementById('ffPath').value.trim()) {
+ document.getElementById('ffPath').value = file.name;
+ }
+ const reader = new FileReader();
+ reader.onload = ev => {
+ pendingFile = { originalName: file.name, mimeType: file.type, size: file.size, data: ev.target.result };
+ label.textContent = ' ' + file.name + ' (' + fileSizeLabel(file.size) + ')';
+ };
+ reader.readAsDataURL(file);
+}
+
+function saveFile() {
+ const name = document.getElementById('ffName').value.trim();
+ if (!name) { alert('Please enter a name.'); return; }
+ const existing = editFileId !== null ? getFiles().find(x => x.id === editFileId) : null;
+ const data = {
+ id: editFileId ?? Date.now(),
+ name,
+ path: document.getElementById('ffPath').value.trim(),
+ tag: document.getElementById('ffTag').value.trim(),
+ desc: document.getElementById('ffDesc').value.trim(),
+ // keep old file data unless new one uploaded
+ data: pendingFile ? pendingFile.data : (existing?.data || null),
+ originalName: pendingFile ? pendingFile.originalName : (existing?.originalName || null),
+ mimeType: pendingFile ? pendingFile.mimeType : (existing?.mimeType || null),
+ size: pendingFile ? pendingFile.size : (existing?.size || null),
+ };
+ const files = getFiles();
+ if (editFileId !== null) { const idx = files.findIndex(x => x.id === editFileId); files[idx] = data; }
+ else { files.unshift(data); }
+ saveFiles(); closeFileModal(); renderFiles();
+}
+
+function deleteFile(id) {
+ if (!confirm('Delete file entry?')) return;
+ setFiles(getFiles().filter(x => x.id !== id));
+ saveFiles(); renderFiles();
+}
+
+
+/* ════════════════════════════════════════════════
+ SCRIPTS
+════════════════════════════════════════════════ */
+const SK_SWIN = 'scripts_win_v1';
+const SK_SLIN = 'scripts_lin_v1';
+let scriptsWin = JSON.parse(localStorage.getItem(SK_SWIN) || '[]');
+let scriptsLin = JSON.parse(localStorage.getItem(SK_SLIN) || '[]');
+let editScriptId = null;
+let scriptFilter = 'all';
+
+function getScripts() { return currentOs === 'win' ? scriptsWin : scriptsLin; }
+function setScripts(arr) { if (currentOs === 'win') scriptsWin = arr; else scriptsLin = arr; }
+function saveScripts() { localStorage.setItem(SK_SWIN, JSON.stringify(scriptsWin)); localStorage.setItem(SK_SLIN, JSON.stringify(scriptsLin)); pbSet(SK_SWIN,scriptsWin); pbSet(SK_SLIN,scriptsLin); }
+
+function langClass(lang) {
+ if (!lang) return 'lang-other';
+ const l = lang.toLowerCase();
+ if (l.includes('power') || l === 'ps1') return 'lang-ps';
+ if (l === 'bash' || l === 'sh') return 'lang-bash';
+ if (l === 'python' || l === 'py') return 'lang-py';
+ if (l === 'javascript' || l === 'js' || l === 'typescript') return 'lang-js';
+ return 'lang-other';
+}
+
+function renderScripts() {
+ const q = (document.getElementById('scriptsSearch')?.value || '').toLowerCase();
+ const scripts = getScripts();
+ const langs = ['all', ...new Set(scripts.map(s => s.lang).filter(Boolean))];
+
+ document.getElementById('scriptsBadge').innerHTML = `<strong>${scripts.length}</strong> Script${scripts.length !== 1 ? 's' : ''}`;
+
+ // Update script tag datalist
+ const tags = [...new Set(scripts.map(s=>s.tag).filter(Boolean))];
+ const dl = document.getElementById('scriptTagList'); if(dl) dl.innerHTML = tags.map(t=>`<option value="${esc(t)}">`).join('');
+
+ // Lang filter pills
+ document.getElementById('langFilters').innerHTML = langs.map(l =>
+ `<span class="lang-pill${scriptFilter===l?' active':''}" onclick="setScriptFilter('${esc(l)}')">${l === 'all' ? 'All' : esc(l)}</span>`
+ ).join('');
+
+ const filtered = scripts.filter(s =>
+ (scriptFilter === 'all' || s.lang === scriptFilter) &&
+ (!q || [s.name, s.desc, s.code, s.tag, s.lang].some(v => v && v.toLowerCase().includes(q)))
+ );
+
+ const listEl = document.getElementById('scriptsList');
+ const emptyEl = document.getElementById('emptyScripts');
+ if (!filtered.length) { listEl.innerHTML = ''; emptyEl.style.display = 'block'; return; }
+ emptyEl.style.display = 'none';
+
+ listEl.innerHTML = filtered.map(s => {
+ const lc = langClass(s.lang);
+ const lines = (s.code||'').split('\n').length;
+ const date = s.updated ? new Date(s.updated).toLocaleDateString('en-GB',{day:'2-digit',month:'2-digit',year:'2-digit'}) : '';
+ return `<div class="script-card">
+ <div class="script-card-header">
+ <span class="script-lang-badge ${lc}">${esc(s.lang||'?')}</span>
+ <span class="script-card-title">${esc(s.name)}</span>
+ ${s.tag ? `<span class="script-card-tag">${esc(s.tag)}</span>` : ''}
+ <div class="script-card-actions">
+ <button class="icon-btn" onclick="openScriptModal(${s.id})" title="Edit">Edit</button>
+ <button class="icon-btn del" onclick="deleteScript(${s.id})" title="Delete">Del</button>
+ </div>
+ </div>
+ ${s.desc ? `<div class="script-card-desc">${esc(s.desc)}</div>` : ''}
+ <div class="script-code-wrap">
+ <pre><code>${esc(s.code||'')}</code></pre>
+ <button class="script-copy-btn" onclick="copyScript(this,${s.id})">copy</button>
+ </div>
+ <div class="script-card-footer">
+ <span class="script-card-meta">${lines} line${lines!==1?'s':''} · ${date}</span>
+ <div style="display:flex;gap:6px">
+ <button class="file-action-btn" onclick="copyScript(this,${s.id})">Copy</button>
+ </div>
+ </div>
+ </div>`;
+ }).join('');
+}
+
+function setScriptFilter(f) { scriptFilter = f; renderScripts(); }
+
+function openScriptModal(id = null) {
+ editScriptId = id;
+ const s = id !== null ? getScripts().find(x => x.id === id) : null;
+ document.getElementById('scriptModalTitle').textContent = id !== null ? '// Edit Script' : '// New Script';
+ document.getElementById('sfName').value = s?.name || '';
+ document.getElementById('sfLang').value = s?.lang || 'PowerShell';
+ document.getElementById('sfTag').value = s?.tag || '';
+ document.getElementById('sfDesc').value = s?.desc || '';
+ document.getElementById('sfCode').value = s?.code || '';
+ document.getElementById('scriptOverlay').classList.add('open');
+ setTimeout(() => document.getElementById('sfName').focus(), 50);
+}
+function closeScriptModal() { document.getElementById('scriptOverlay').classList.remove('open'); editScriptId = null; }
+
+function saveScript() {
+ const name = document.getElementById('sfName').value.trim();
+ const code = document.getElementById('sfCode').value;
+ if (!name) { alert('Please enter a name.'); return; }
+ const data = { id: editScriptId ?? Date.now(), name, lang: document.getElementById('sfLang').value, tag: document.getElementById('sfTag').value.trim(), desc: document.getElementById('sfDesc').value.trim(), code, updated: Date.now() };
+ const scripts = getScripts();
+ if (editScriptId !== null) { const i = scripts.findIndex(x=>x.id===editScriptId); scripts[i]=data; }
+ else { scripts.unshift(data); }
+ saveScripts(); closeScriptModal(); renderScripts();
+}
+function deleteScript(id) {
+ if (!confirm('Delete script?')) return;
+ setScripts(getScripts().filter(x=>x.id!==id));
+ saveScripts(); renderScripts();
+}
+function copyScript(btn, id) {
+ const s = getScripts().find(x=>x.id===id);
+ if (!s?.code) return;
+ navigator.clipboard.writeText(s.code).then(() => {
+ const orig = btn.textContent; btn.textContent = ' copied'; btn.classList.add('copied');
+ setTimeout(() => { btn.textContent = orig; btn.classList.remove('copied'); }, 1500);
+ });
+}
+function scriptTabKey(e) {
+ if (e.key === 'Tab') { e.preventDefault(); const t=e.target,s=t.selectionStart; t.value=t.value.slice(0,s)+' '+t.value.slice(t.selectionEnd); t.selectionStart=t.selectionEnd=s+2; }
+}
+
+/* ════════════════════════════════════════════════
+ LINKS
+════════════════════════════════════════════════ */
+const SK_LWIN = 'links_win_v1';
+const SK_LLIN = 'links_lin_v1';
+let linksWin = JSON.parse(localStorage.getItem(SK_LWIN) || '[]');
+let linksLin = JSON.parse(localStorage.getItem(SK_LLIN) || '[]');
+let editLinkId = null;
+let linkFilter = 'all';
+
+function getLinks() { return currentOs === 'win' ? linksWin : linksLin; }
+function setLinks(arr) { if (currentOs === 'win') linksWin = arr; else linksLin = arr; }
+function saveLinks() { localStorage.setItem(SK_LWIN, JSON.stringify(linksWin)); localStorage.setItem(SK_LLIN, JSON.stringify(linksLin)); pbSet(SK_LWIN,linksWin); pbSet(SK_LLIN,linksLin); }
+
+function faviconUrl(url) {
+ try { const u = new URL(url); return `https://www.google.com/s2/favicons?domain=${u.hostname}&sz=32`; } catch { return null; }
+}
+function linkDomain(url) {
+ try { return new URL(url).hostname.replace('www.',''); } catch { return url; }
+}
+
+function renderLinks() {
+ const q = (document.getElementById('linksSearch')?.value || '').toLowerCase();
+ const links = getLinks();
+ const tags = [...new Set(links.map(l=>l.tag).filter(Boolean))].sort();
+
+ document.getElementById('linksBadge').innerHTML = `<strong>${links.length}</strong> Link${links.length!==1?'s':''}`;
+ const dl = document.getElementById('linkTagList'); if(dl) dl.innerHTML = tags.map(t=>`<option value="${esc(t)}">`).join('');
+
+ const pills = [{ id:'all', label:'All' }, ...tags.map(t=>({id:t,label:t}))];
+ document.getElementById('linkFilters').innerHTML = pills.map(p =>
+ `<span class="lang-pill${linkFilter===p.id?' active':''}" onclick="setLinkFilter('${esc(p.id)}')">${esc(p.label)}</span>`
+ ).join('');
+
+ const filtered = links.filter(l =>
+ (linkFilter === 'all' || (l.tag||'') === linkFilter) &&
+ (!q || [l.title, l.url, l.desc, l.tag].some(v => v && v.toLowerCase().includes(q)))
+ );
+
+ const gridEl = document.getElementById('linksGrid');
+ const emptyEl = document.getElementById('emptyLinks');
+ if (!filtered.length) { gridEl.innerHTML=''; emptyEl.style.display='block'; return; }
+ emptyEl.style.display = 'none';
+
+ gridEl.innerHTML = filtered.map(l => {
+ const fav = l.url ? faviconUrl(l.url) : null;
+ const initial = (l.title||'?').charAt(0).toUpperCase();
+ const iconHtml = fav
+ ? `<img class="link-favicon" src="${fav}" alt="" onerror="this.outerHTML='<div class=link-favicon-fallback>${initial}</div>'" />`
+ : `<div class="link-favicon-fallback">${initial}</div>`;
+ return `<div class="link-card">
+ <div class="link-card-actions">
+ <button class="icon-btn" onclick="openLinkModal(${l.id})" title="Edit">Edit</button>
+ <button class="icon-btn del" onclick="deleteLink(${l.id})" title="Delete">Del</button>
+ </div>
+ <div class="link-card-top">
+ ${iconHtml}
+ <div class="link-title">${esc(l.title||l.url)}</div>
+ </div>
+ ${l.tag ? `<span class="link-tag">${esc(l.tag)}</span>` : ''}
+ <div class="link-url">${esc(linkDomain(l.url||''))}</div>
+ ${l.desc ? `<div class="link-desc">${esc(l.desc)}</div>` : ''}
+ <div class="link-card-btns">
+ <a class="link-btn" href="${esc(l.url||'#')}" target="_blank" rel="noopener">Open</a>
+ <button class="link-btn" onclick="copyLinkUrl(this,${l.id})">Copy</button>
+ <button class="link-btn" onclick="showQR('${esc(l.url||'')}')" title="ShowQR Code">QR</button>
+ </div>
+ </div>`;
+ }).join('');
+}
+
+function setLinkFilter(f) { linkFilter = f; renderLinks(); }
+
+function autoFillLinkTitle() {
+ const url = document.getElementById('lfUrl').value.trim();
+ const titleEl = document.getElementById('lfTitle');
+ if (titleEl && !titleEl.value && url) {
+ try { titleEl.value = new URL(url).hostname.replace('www.',''); } catch {}
+ }
+}
+
+function openLinkModal(id = null) {
+ editLinkId = id;
+ const l = id !== null ? getLinks().find(x=>x.id===id) : null;
+ document.getElementById('linkModalTitle').textContent = id !== null ? '// Edit Link' : '// New Link';
+ document.getElementById('lfTitle').value = l?.title || '';
+ document.getElementById('lfUrl').value = l?.url || '';
+ document.getElementById('lfTag').value = l?.tag || '';
+ document.getElementById('lfDesc').value = l?.desc || '';
+ document.getElementById('linkOverlay').classList.add('open');
+ setTimeout(() => document.getElementById('lfUrl').focus(), 50);
+}
+function closeLinkModal() { document.getElementById('linkOverlay').classList.remove('open'); editLinkId = null; }
+
+function saveLink() {
+ const title = document.getElementById('lfTitle').value.trim();
+ const url = document.getElementById('lfUrl').value.trim();
+ if (!url) { alert('Please enter a URL.'); return; }
+ const data = { id: editLinkId ?? Date.now(), title: title || linkDomain(url), url, tag: document.getElementById('lfTag').value.trim(), desc: document.getElementById('lfDesc').value.trim() };
+ const links = getLinks();
+ if (editLinkId !== null) { const i = links.findIndex(x=>x.id===editLinkId); links[i]=data; }
+ else { links.unshift(data); }
+ saveLinks(); closeLinkModal(); renderLinks();
+}
+function deleteLink(id) {
+ if (!confirm('Delete link?')) return;
+ setLinks(getLinks().filter(x=>x.id!==id));
+ saveLinks(); renderLinks();
+}
+function copyLinkUrl(btn, id) {
+ const l = getLinks().find(x=>x.id===id);
+ if (!l?.url) return;
+ navigator.clipboard.writeText(l.url).then(() => {
+ btn.textContent=' copied'; btn.classList.add('copied');
+ setTimeout(()=>{ btn.textContent='Copy'; btn.classList.remove('copied'); },1500);
+ });
+}
+
+
+/* ════════════════════════════════════════════════
+ THEME
+════════════════════════════════════════════════ */
+let currentTheme = (() => { try { return JSON.parse(localStorage.getItem('theme')) || 'dark'; } catch(e) { return localStorage.getItem('theme') || 'dark'; } })();
+function applyTheme() {
+ document.body.classList.toggle('light', currentTheme === 'light');
+ document.getElementById('themeBtn').textContent = currentTheme === 'light' ? '' : '';
+}
+function toggleTheme() {
+ currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+ localStorage.setItem('theme', JSON.stringify(currentTheme));
+ applyTheme();
+}
+
+/* ════════════════════════════════════════════════
+ IMPORT / EXPORT
+════════════════════════════════════════════════ */
+function exportData() {
+ const keys = ['prog_win_v1','prog_lin_v1','todo_win_v2','todo_lin_v1','files_win_v1','files_lin_v1',
+ 'wiki_win_v1','wiki_lin_v1','scripts_win_v1','scripts_lin_v1','links_win_v1','links_lin_v1',
+ 'timeline_v1','theme'];
+ const data = {};
+ keys.forEach(k => { const v = localStorage.getItem(k); if(v) data[k]=JSON.parse(v); });
+ const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+ const a = document.createElement('a');
+ a.href = URL.createObjectURL(blob);
+ a.download = `sysboard-backup-${new Date().toISOString().slice(0,10)}.json`;
+ a.click();
+ addTimeline('export','','Exported all data as JSON','');
+}
+function importData(input) {
+ const file = input.files[0]; if(!file) return;
+ const reader = new FileReader();
+ reader.onload = ev => {
+ try {
+ const data = JSON.parse(ev.target.result);
+ if (!confirm(`Import ${Object.keys(data).length} data keys? This will overwrite existing data.`)) return;
+ Object.entries(data).forEach(([k,v]) => localStorage.setItem(k, JSON.stringify(v)));
+ // reload all state
+ entriesWin = JSON.parse(localStorage.getItem('prog_win_v1')||'[]');
+ entriesLin = JSON.parse(localStorage.getItem('prog_lin_v1')||'[]');
+ todosWin = JSON.parse(localStorage.getItem('todo_win_v2')||'null') || JSON.parse(JSON.stringify(DEFAULT_WIN));
+ todosLin = JSON.parse(localStorage.getItem('todo_lin_v1')||'null') || JSON.parse(JSON.stringify(DEFAULT_LIN));
+ filesWin = JSON.parse(localStorage.getItem('files_win_v1')||'[]');
+ filesLin = JSON.parse(localStorage.getItem('files_lin_v1')||'[]');
+ wikiWin = JSON.parse(localStorage.getItem('wiki_win_v1')||'[]');
+ wikiLin = JSON.parse(localStorage.getItem('wiki_lin_v1')||'[]');
+ scriptsWin = JSON.parse(localStorage.getItem('scripts_win_v1')||'[]');
+ scriptsLin = JSON.parse(localStorage.getItem('scripts_lin_v1')||'[]');
+ linksWin = JSON.parse(localStorage.getItem('links_win_v1')||'[]');
+ linksLin = JSON.parse(localStorage.getItem('links_lin_v1')||'[]');
+ addTimeline('import','','Imported data from JSON file','');
+ renderAll();
+ alert('Import successful!');
+ } catch(e) { alert('Import failed: invalid JSON file.'); }
+ };
+ reader.readAsText(file);
+ input.value='';
+}
+
+/* ════════════════════════════════════════════════
+ PINNED & RECENT
+════════════════════════════════════════════════ */
+function togglePin(id) {
+ const e = getEntries().find(x=>x.id===id);
+ if(e) { e.pinned = !e.pinned; saveEntries(); renderCards(); }
+}
+const RECENT_KEY = 'recent_v1';
+function getRecent(type) {
+ const r = JSON.parse(localStorage.getItem(RECENT_KEY)||'{}');
+ return r[currentOs+'_'+type] || [];
+}
+function addRecent(type, id) {
+ const r = JSON.parse(localStorage.getItem(RECENT_KEY)||'{}');
+ const key = currentOs+'_'+type;
+ let arr = r[key] || [];
+ arr = [id, ...arr.filter(x=>x!==id)].slice(0,10);
+ r[key] = arr;
+ localStorage.setItem(RECENT_KEY, JSON.stringify(r));
+}
+// Patch openModal to track recent
+// Patch openModal to track recent (wrap via variable, not re-declaration)
+const _baseOpenModal = openModal;
+openModal = function(id=null, presetTag=null) {
+ if(id !== null) addRecent('prog', id);
+ _baseOpenModal(id, presetTag);
+};
+
+/* ════════════════════════════════════════════════
+ DRAG & DROP (cards)
+════════════════════════════════════════════════ */
+let dragCardId = null;
+function dragCardStart(e, id) { dragCardId = id; e.dataTransfer.effectAllowed='move'; }
+function dragCardOver(e) { e.preventDefault(); e.currentTarget.classList.add('drag-over'); }
+function dragCardDrop(e, targetId) {
+ e.preventDefault(); e.currentTarget.classList.remove('drag-over');
+ if(dragCardId === null || dragCardId === targetId) return;
+ const entries = getEntries();
+ const fromIdx = entries.findIndex(x=>x.id===dragCardId);
+ const toIdx = entries.findIndex(x=>x.id===targetId);
+ if(fromIdx===-1||toIdx===-1) return;
+ const [moved] = entries.splice(fromIdx,1);
+ entries.splice(toIdx,0,moved);
+ saveEntries(); renderCards(); dragCardId=null;
+}
+
+/* ════════════════════════════════════════════════
+ GLOBAL SEARCH
+════════════════════════════════════════════════ */
+function openGlobalSearch() {
+ document.getElementById('gsearchOverlay').classList.add('open');
+ setTimeout(()=>document.getElementById('gsearchInput').focus(),60);
+}
+function closeGlobalSearch() {
+ document.getElementById('gsearchOverlay').classList.remove('open');
+ document.getElementById('gsearchInput').value='';
+ document.getElementById('gsearchResults').innerHTML='<div class="gsearch-empty">Start typing to search across all tabs</div>';
+}
+function runGlobalSearch() {
+ const q = document.getElementById('gsearchInput').value.trim().toLowerCase();
+ const res = document.getElementById('gsearchResults');
+ if(!q) { res.innerHTML='<div class="gsearch-empty">Start typing …</div>'; return; }
+ let html='', total=0;
+ const sections=[
+ { label:'Programs', icon:'', items: [...entriesWin,...entriesLin], fields:['name','url','tag','comment'], action: id=>`openModal(${id})` },
+ { label:'Scripts', icon:'', items: [...scriptsWin,...scriptsLin], fields:['name','desc','code','tag'], action: id=>`openScriptModal(${id})` },
+ { label:'Links', icon:'', items: [...linksWin,...linksLin], fields:['title','url','desc','tag'], name:'title', action: id=>`openLinkModal(${id})` },
+ { label:'Files', icon:'', items: [...filesWin,...filesLin], fields:['name','path','desc','tag'], action: id=>`openFileModal(${id})` },
+ { label:'Wiki', icon:'', items: [...wikiWin,...wikiLin], fields:['title','content','tag'], name:'title', action: id=>`openWikiPage(${id})` },
+ ];
+ sections.forEach(sec=>{
+ const hits = sec.items.filter(x=> sec.fields.some(f=>x[f]&&x[f].toLowerCase().includes(q))).slice(0,5);
+ if(!hits.length) return;
+ total+=hits.length;
+ html+=`<div class="gsearch-section"><div class="gsearch-section-label">${sec.label}</div>`;
+ hits.forEach(x=>{
+ const title = x[sec.name||'name']||'Untitled';
+ const sub = sec.fields.slice(1).map(f=>x[f]).filter(Boolean).join(' · ').slice(0,60);
+ html+=`<div class="gsearch-item" onclick="${sec.action(x.id)};closeGlobalSearch();switchTab('all')">
+ <span class="gsearch-item-icon">${sec.icon}</span>
+ <div class="gsearch-item-body">
+ <div class="gsearch-item-title">${esc(title)}</div>
+ ${sub?`<div class="gsearch-item-sub">${esc(sub)}</div>`:''}
+ </div>
+ ${x.tag?`<span class="gsearch-item-tag">#${esc(x.tag)}</span>`:''}
+ </div>`;
+ });
+ html+='</div>';
+ });
+ res.innerHTML = total ? html : '<div class="gsearch-empty">No results found.</div>';
+}
+document.addEventListener('keydown', ev=>{
+ if((ev.ctrlKey||ev.metaKey)&&ev.key==='k'){ ev.preventDefault(); openGlobalSearch(); }
+});
+
+/* ════════════════════════════════════════════════
+ DASHBOARD
+════════════════════════════════════════════════ */
+function renderDashboard() {
+ const hour = new Date().getHours();
+ const greet = hour<12?'Good Morning':hour<17?'Good Afternoon':'Good Evening';
+ const g=document.getElementById('dashGreeting');
+ if(g) g.innerHTML=`// <span>${hour<12?'Good Morning':hour<17?'Good Afternoon':'Good Evening'}</span> — ${currentOs==='win'?' Windows':' Linux'} Workspace`;
+
+ const eW=entriesWin.length, eL=entriesLin.length;
+ const sW=scriptsWin.length,sL=scriptsLin.length;
+ const lW=linksWin.length,lL=linksLin.length;
+ const fW=filesWin.length,fL=filesLin.length;
+ const wW=wikiWin.length,wL=wikiLin.length;
+ const stats=[
+ {icon:'',num:eW+eL,label:'Programs',tab:'all'},
+ {icon:'',num:sW+sL,label:'Scripts',tab:'scripts'},
+ {icon:'',num:lW+lL,label:'Links',tab:'links'},
+ {icon:'',num:fW+fL,label:'Files',tab:'files'},
+ {icon:'',num:wW+wL,label:'Wiki Pages',tab:'wiki'},
+ ];
+ const sEl=document.getElementById('dashStats');
+ if(sEl) sEl.innerHTML=stats.map(s=>`<div class="stat-card" onclick="switchTab('${s.tab}')">
+ <div class="stat-card-icon">${s.icon}</div>
+ <div class="stat-card-num">${s.num}</div>
+ <div class="stat-card-label">${s.label}</div>
+ </div>`).join('');
+
+ // Todo progress
+ const calcProg=(todos)=>{ let t=0,d=0; todos.forEach(s=>s.items.forEach(i=>{t++;if(i.done)d++;})); return{t,d,pct:t?Math.round(d/t*100):0}; };
+ const wp=calcProg(todosWin), lp=calcProg(todosLin);
+ const tr=document.getElementById('dashTodoRow');
+ if(tr) tr.innerHTML=`
+ <div class="dash-todo-box">
+ <div class="dash-todo-box-label"> Windows Setup</div>
+ <div class="dash-progress-label"><span>Progress</span><span>${wp.d}/${wp.t}</span></div>
+ <div class="dash-progress-bar"><div class="dash-progress-fill" style="width:${wp.pct}%"></div></div>
+ </div>
+ <div class="dash-todo-box">
+ <div class="dash-todo-box-label"> Linux Setup</div>
+ <div class="dash-progress-label"><span>Progress</span><span>${lp.d}/${lp.t}</span></div>
+ <div class="dash-progress-bar"><div class="dash-progress-fill" style="width:${lp.pct}%"></div></div>
+ </div>`;
+
+ //Recent timeline events
+ const tl=JSON.parse(localStorage.getItem('timeline_v1')||'[]').slice(0,8);
+ const rEl=document.getElementById('dashRecent');
+ if(rEl) rEl.innerHTML=tl.length?tl.map(ev=>`<div class="dash-recent-item">
+ <span class="dash-recent-icon">${ev.icon}</span>
+ <div class="dash-recent-info">
+ <div class="dash-recent-name">${esc(ev.text)}</div>
+ <div class="dash-recent-meta">${new Date(ev.ts).toLocaleString('en-GB',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'})}</div>
+ </div>
+ </div>`).join(''):`<div style="color:var(--muted);font-size:0.84rem;padding:10px 0">No activity yet. Start adding entries!</div>`;
+}
+
+/* ════════════════════════════════════════════════
+ SCRATCH PAD
+════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════
+ TAGS MANAGER
+════════════════════════════════════════════════ */
+function openTagsManager(){
+ document.getElementById('tagsOverlay').classList.add('open');
+ renderTagsManager();
+}
+function closeTagsManager(){ document.getElementById('tagsOverlay').classList.remove('open'); }
+function renderTagsManager(){
+ const allItems=[
+ ...entriesWin.map(x=>({...x,_type:'prog',_os:'win'})),
+ ...entriesLin.map(x=>({...x,_type:'prog',_os:'lin'})),
+ ...scriptsWin.map(x=>({...x,_type:'scripts',_os:'win'})),
+ ...scriptsLin.map(x=>({...x,_type:'scripts',_os:'lin'})),
+ ...linksWin.map(x=>({...x,_type:'links',_os:'win'})),
+ ...linksLin.map(x=>({...x,_type:'links',_os:'lin'})),
+ ...filesWin.map(x=>({...x,_type:'files',_os:'win'})),
+ ...filesLin.map(x=>({...x,_type:'files',_os:'lin'})),
+ ];
+ const tagMap={};
+ allItems.forEach(x=>{ const t=(x.tag||'').trim(); if(!t) return; if(!tagMap[t]) tagMap[t]={prog:0,scripts:0,links:0,files:0}; tagMap[t][x._type]=(tagMap[t][x._type]||0)+1; });
+ const tags=Object.keys(tagMap).sort((a,b)=>a.localeCompare(b));
+ const list=document.getElementById('tagsManagerList');
+ if(!tags.length){ list.innerHTML='<div style="color:var(--muted);font-size:0.82rem;text-align:center;padding:20px">No tags found.</div>'; return; }
+ list.innerHTML=tags.map(tag=>{
+ const c=tagMap[tag];
+ return `<div class="tag-row" id="tagrow_${esc(tag)}">
+ <span class="tag-row-name" id="tagname_${esc(tag)}">#${esc(tag)}</span>
+ <div class="tag-row-counts">
+ ${c.prog?`<span class="tag-count-pill"> ${c.prog}</span>`:''}
+ ${c.scripts?`<span class="tag-count-pill"> ${c.scripts}</span>`:''}
+ ${c.links?`<span class="tag-count-pill"> ${c.links}</span>`:''}
+ ${c.files?`<span class="tag-count-pill"> ${c.files}</span>`:''}
+ </div>
+ <div class="tag-row-actions">
+ <button class="cat-btn" onclick="startTagRename('${esc(tag)}')">Rename</button>
+ <button class="cat-btn del" onclick="deleteGlobalTag('${esc(tag)}')">Del</button>
+ </div>
+ </div>`;
+ }).join('');
+}
+function startTagRename(tag){
+ const nameEl=document.getElementById('tagname_'+tag); if(!nameEl) return;
+ const input=document.createElement('input');
+ input.className='tag-rename-inline'; input.value=tag;
+ nameEl.replaceWith(input); input.focus(); input.select();
+ input.onblur=()=>commitTagRename(tag,input.value.trim());
+ input.onkeydown=ev=>{ if(ev.key==='Enter')input.blur(); if(ev.key==='Escape'){input.value=tag;input.blur();} };
+}
+function commitTagRename(oldTag,newTag){
+ if(!newTag||newTag===oldTag){ renderTagsManager(); return; }
+ [entriesWin,entriesLin,scriptsWin,scriptsLin,linksWin,linksLin,filesWin,filesLin].forEach(arr=>
+ arr.forEach(x=>{ if((x.tag||'').trim()===oldTag) x.tag=newTag; })
+ );
+ saveEntries(); saveScripts(); saveLinks(); saveFiles();
+ addTimeline('edit','',`Renamed tag "#${oldTag}" to "#${newTag}"`,newTag);
+ renderTagsManager(); renderAll();
+}
+function deleteGlobalTag(tag){
+ const total=[...entriesWin,...entriesLin,...scriptsWin,...scriptsLin,...linksWin,...linksLin,...filesWin,...filesLin].filter(x=>(x.tag||'').trim()===tag).length;
+ if(!confirm(`Remove tag "#${tag}" from ${total} item${total!==1?'s':''}?`)) return;
+ [entriesWin,entriesLin,scriptsWin,scriptsLin,linksWin,linksLin,filesWin,filesLin].forEach(arr=>
+ arr.forEach(x=>{ if((x.tag||'').trim()===tag) x.tag=''; })
+ );
+ saveEntries(); saveScripts(); saveLinks(); saveFiles();
+ addTimeline('delete','',`Deleted tag "#${tag}"`,tag);
+ renderTagsManager(); renderAll();
+}
+
+/* ════════════════════════════════════════════════
+ TIMELINE
+════════════════════════════════════════════════ */
+function addTimeline(type,icon,text,tag){
+ const tl=JSON.parse(localStorage.getItem('timeline_v1')||'[]');
+ tl.unshift({id:Date.now(),type,icon,text,tag,ts:Date.now(),os:currentOs});
+ const newTl=tl.slice(0,500);
+ localStorage.setItem('timeline_v1',JSON.stringify(newTl));
+ pbSet('timeline_v1',newTl);
+}
+function renderTimeline(){
+ const tl=JSON.parse(localStorage.getItem('timeline_v1')||'[]');
+ document.getElementById('timelineBadge').innerHTML=`<strong>${tl.length}</strong> Event${tl.length!==1?'s':''}`;
+ const list=document.getElementById('timelineList'); if(!list) return;
+ if(!tl.length){ list.innerHTML='<div class="timeline-empty">No events recorded yet.<br>Actions like adding, editing, and deleting entries will appear here.</div>'; return; }
+ // Group by day
+ const grouped={};
+ tl.forEach(ev=>{ const d=new Date(ev.ts).toLocaleDateString('en-GB',{weekday:'long',day:'2-digit',month:'long',year:'numeric'}); if(!grouped[d]) grouped[d]=[]; grouped[d].push(ev); });
+ list.innerHTML=Object.entries(grouped).map(([day,events])=>`
+ <div class="timeline-day">
+ <div class="timeline-day-label">${day}</div>
+ ${events.map(ev=>`<div class="timeline-item ${ev.type}">
+ <span class="timeline-icon">${ev.icon}</span>
+ <div class="timeline-body">
+ <div class="timeline-text">${esc(ev.text)} ${ev.os?`<span style="font-size:0.7rem">${ev.os==='win'?'':''}</span>`:''}</div>
+ <div class="timeline-meta">${new Date(ev.ts).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}${ev.tag?` · <span class="timeline-tag">#${esc(ev.tag)}</span>`:''}</div>
+ </div>
+ </div>`).join('')}
+ </div>`).join('');
+}
+function clearTimeline(){ if(!confirm('Clear all timeline events?')) return; localStorage.removeItem('timeline_v1'); pbSet('timeline_v1',[]); renderTimeline(); renderDashboard(); }
+
+/* ════════════════════════════════════════════════
+ CHECKLIST TEMPLATES
+════════════════════════════════════════════════ */
+const TEMPLATES=[
+ { name:'Gaming PC (Windows)', desc:'Drivers, launchers, peripherals, and performance tuning', items:[
+ {label:'Install GPU drivers (NVIDIA/AMD)',ps:'winget install --id NVIDIA.GeForceExperience'},
+ {label:'Install Steam',ps:'winget install --id Valve.Steam'},
+ {label:'Install Discord',ps:'winget install --id Discord.Discord'},
+ {label:'Enable Game Mode',ps:"Set-ItemProperty -Path 'HKCU:\Software\Microsoft\GameBar' -Name 'AllowAutoGameMode' -Value 1"},
+ {label:'Install Visual C++ Redistributables',ps:'winget install --id Microsoft.VCRedist.2015+.x64'},
+ {label:'Install DirectX',ps:'winget install --id Microsoft.DirectX'},
+ {label:'Disable Xbox Game Bar (optional)',ps:"Set-ItemProperty -Path 'HKCU:\Software\Microsoft\Windows\CurrentVersion\GameDVR' -Name 'AppCaptureEnabled' -Value 0"},
+ {label:'Configure power plan: High Performance',ps:'powercfg /setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c'},
+ {label:'Install Razer Synapse / Logitech G Hub (peripherals)',ps:''},
+ {label:'Disable startup delay for apps',ps:'winget upgrade --all'},
+ ]},
+ { name:'Dev Machine (Windows)', desc:'Dev tools, runtimes, and productivity software', items:[
+ {label:'Install Git',ps:'winget install --id Git.Git'},
+ {label:'Install Node.js LTS',ps:'winget install --id OpenJS.NodeJS.LTS'},
+ {label:'Install Python',ps:'winget install --id Python.Python.3'},
+ {label:'Install Visual Studio Code',ps:'winget install --id Microsoft.VisualStudioCode'},
+ {label:'Install Windows Terminal',ps:'winget install --id Microsoft.WindowsTerminal'},
+ {label:'Install Docker Desktop',ps:'winget install --id Docker.DockerDesktop'},
+ {label:'Install WSL 2',ps:'wsl --install'},
+ {label:'Install PowerShell 7',ps:'winget install --id Microsoft.PowerShell'},
+ {label:'Configure Git user',ps:'git config --global user.name "Name"; git config --global user.email "email"'},
+ {label:'Install Oh My Posh (terminal theme)',ps:'winget install --id JanDeDobbeleer.OhMyPosh'},
+ ]},
+ { name:'Ubuntu Server', desc:'Essential server hardening and setup tasks', items:[
+ {label:'Update all packages',ps:'sudo apt update && sudo apt upgrade -y'},
+ {label:'Set hostname',ps:'sudo hostnamectl set-hostname myserver'},
+ {label:'Create non-root sudo user',ps:'sudo adduser deploy && sudo usermod -aG sudo deploy'},
+ {label:'Configure UFW firewall',ps:'sudo ufw allow OpenSSH && sudo ufw enable'},
+ {label:'Disable root SSH login',ps:'sudo sed -i "s/PermitRootLogin yes/PermitRootLogin no/" /etc/ssh/sshd_config && sudo systemctl restart ssh'},
+ {label:'Install fail2ban',ps:'sudo apt install fail2ban -y && sudo systemctl enable fail2ban'},
+ {label:'Configure automatic security updates',ps:'sudo apt install unattended-upgrades -y'},
+ {label:'Install and configure Nginx',ps:'sudo apt install nginx -y && sudo systemctl enable nginx'},
+ {label:'Set up Let\'s Encrypt SSL',ps:'sudo apt install certbot python3-certbot-nginx -y'},
+ {label:'Configure log rotation',ps:'sudo logrotate -f /etc/logrotate.conf'},
+ ]},
+ { name:'Dev Machine (Linux)', desc:'Development environment on Ubuntu/Debian', items:[
+ {label:'Install build essentials',ps:'sudo apt install build-essential curl git -y'},
+ {label:'Install Node.js via nvm',ps:'curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash'},
+ {label:'Install Python & pip',ps:'sudo apt install python3 python3-pip python3-venv -y'},
+ {label:'Install Docker',ps:'curl -fsSL https://get.docker.com | sh && sudo usermod -aG docker $USER'},
+ {label:'Install VS Code',ps:'sudo snap install code --classic'},
+ {label:'Install Zsh + Oh My Zsh',ps:'sudo apt install zsh -y && sh -c "$(curl -fsSL https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"'},
+ {label:'Generate SSH key',ps:'ssh-keygen -t ed25519 -C "your_email@example.com"'},
+ {label:'Configure Git',ps:'git config --global user.name "Name" && git config --global user.email "email"'},
+ {label:'Install GitHub CLI',ps:'sudo apt install gh -y'},
+ ]},
+ { name:'Office PC (Windows)', desc:'Business productivity and communication tools', items:[
+ {label:'Install Microsoft Office / 365',ps:'winget install --id Microsoft.Office'},
+ {label:'Install Teams',ps:'winget install --id Microsoft.Teams'},
+ {label:'Install Zoom',ps:'winget install --id Zoom.Zoom'},
+ {label:'Install browser + sign in',ps:'winget install --id Mozilla.Firefox'},
+ {label:'Configure VPN client',ps:''},
+ {label:'Map network drives',ps:'net use Z: \\server\share /persistent:yes'},
+ {label:'Configure printers',ps:''},
+ {label:'Set up email client (Outlook)',ps:''},
+ {label:'Enable BitLocker',ps:'Enable-BitLocker -MountPoint "C:" -RecoveryPasswordProtector'},
+ {label:'Join domain',ps:'Add-Computer -DomainName "company.local" -Restart'},
+ ]},
+];
+
+function openTemplates(){
+  const overlay = document.getElementById('templatesOverlay');
+  const list    = document.getElementById('templateList');
+  if(!overlay || !list){ alert('Templates modal not found.'); return; }
+  if(!TEMPLATES || !TEMPLATES.length){ alert('No templates defined.'); return; }
+  list.innerHTML = TEMPLATES.map((t, i) =>
+    `<div class="template-item" onclick="loadTemplate(${i})">
+      <div class="template-item-title">${esc(t.name)}</div>
+      <div class="template-item-desc">${esc(t.desc)}</div>
+      <div class="template-item-count">${t.items.length} tasks</div>
+    </div>`
+  ).join('');
+  overlay.classList.add('open');
+}
+function closeTemplates(){
+  const overlay = document.getElementById('templatesOverlay');
+  if(overlay) overlay.classList.remove('open');
+}
+function loadTemplate(idx){
+  const t = TEMPLATES[idx];
+  if(!t){ console.error('Template not found:', idx); return; }
+  if(!confirm('Add "' + t.name + '" (' + t.items.length + ' tasks) to the current Setup ToDo list?')) return;
+  const base = Date.now();
+  const section = {
+    id: 's' + base,
+    title: t.name,
+    open: true,
+    items: t.items.map((item, i) => ({
+      id: 'i' + (base + i + 1),
+      label: item.label,
+      done: false,
+      note: '',
+      ps: item.ps || ''
+    }))
+  };
+  const todos = getTodos();
+  todos.push(section);
+  saveTodos();
+  closeTemplates();
+  renderTodos();
+  addTimeline('create', '', 'Loaded template: ' + t.name, currentOs);
+}
+
+/* ════════════════════════════════════════════════
+ QR CODE
+════════════════════════════════════════════════ */
+let qrInstance=null;
+function showQR(url){
+ document.getElementById('qrUrl').textContent=url;
+ document.getElementById('qrCanvas').innerHTML='';
+ document.getElementById('qrOverlay').classList.add('open');
+ if(typeofQRCode !== 'undefined'){
+ qrInstance=newQRCode(document.getElementById('qrCanvas'),{text:url,width:200,height:200,colorDark:'#e03030',colorLight:'#2a2a2a'});
+ } else {
+ document.getElementById('qrCanvas').innerHTML=`<img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}&color=e03030&bgcolor=2a2a2a" width="200" height="200" />`;
+ }
+}
+function closeQR(){ document.getElementById('qrOverlay').classList.remove('open'); document.getElementById('qrCanvas').innerHTML=''; }
+
+/* ════════ PATCH TIMELINE INTO save functions ════════ */
+/* ── Icon helpers ── */
+function updateIconPreview(icon) {
+ const wrap = document.getElementById('iconPreviewWrap');
+ const emoji = document.getElementById('iconPreviewEmoji');
+ wrap.dataset.icon = icon;
+ // clear children except clear btn
+ const clearBtn = document.getElementById('iconClearBtn');
+ wrap.innerHTML = '';
+ wrap.appendChild(clearBtn || Object.assign(document.createElement('div'), {id:'iconClearBtn',className:'icon-clear',textContent:'',onclick:'clearIcon(event)'}));
+ if (!icon) {
+ wrap.insertAdjacentHTML('afterbegin', '');
+ } else if (icon.startsWith('data:') || icon.startsWith('http') || icon.startsWith('/')) {
+ const img = document.createElement('img');
+ img.src = icon; img.style.cssText='width:100%;height:100%;object-fit:cover;border-radius:7px;';
+ img.onerror = () => updateIconPreview('');
+ wrap.insertAdjacentElement('afterbegin', img);
+ } else {
+ wrap.insertAdjacentHTML('afterbegin', `<span class="icon-preview-emoji" id="iconPreviewEmoji">${esc(icon)}</span>`);
+ }
+}
+
+function clearIconIfSet(e) {
+ const wrap = document.getElementById('iconPreviewWrap');
+ if (wrap.dataset.icon) { e.stopPropagation(); clearIcon(e); }
+}
+function clearIcon(e) {
+ e.stopPropagation();
+ document.getElementById('fIconUrl').value = '';
+ document.getElementById('fIconEmoji').value = '';
+ document.getElementById('fIconFile').value = '';
+ updateIconPreview('');
+}
+
+function onIconUrlInput() {
+ const url = document.getElementById('fIconUrl').value.trim();
+ document.getElementById('fIconEmoji').value = '';
+ updateIconPreview(url);
+}
+function onEmojiInput() {
+ const em = document.getElementById('fIconEmoji').value.trim();
+ document.getElementById('fIconUrl').value = '';
+ updateIconPreview(em);
+}
+function onIconFileChange(input) {
+ const file = input.files[0];
+ if (!file) return;
+ const reader = new FileReader();
+ reader.onload = ev => {
+ document.getElementById('fIconUrl').value = '';
+ document.getElementById('fIconEmoji').value = '';
+ updateIconPreview(ev.target.result);
+ };
+ reader.readAsDataURL(file);
+}
+
+
+/* ════════════════════════════════════════════════
+ WIKI
+════════════════════════════════════════════════ */
+const SK_WWIN = 'wiki_win_v1';
+const SK_WLIN = 'wiki_lin_v1';
+let wikiWin = JSON.parse(localStorage.getItem(SK_WWIN) || '[]');
+let wikiLin = JSON.parse(localStorage.getItem(SK_WLIN) || '[]');
+let wikiPageId = null; // currently open page id
+let wikiMode = 'edit'; // 'edit' | 'view'
+let wikiSaveTimer = null;
+
+function getWiki() { return currentOs === 'win' ? wikiWin : wikiLin; }
+function saveWiki() { localStorage.setItem(SK_WWIN, JSON.stringify(wikiWin)); localStorage.setItem(SK_WLIN, JSON.stringify(wikiLin)); pbSet(SK_WWIN,wikiWin); pbSet(SK_WLIN,wikiLin); }
+
+/* ── Sidebar list ── */
+function renderWikiList() {
+ const q = (document.getElementById('wikiSearch')?.value || '').toLowerCase();
+ const pages = getWiki().filter(p =>
+ !q || p.title.toLowerCase().includes(q) || (p.content||'').toLowerCase().includes(q)
+ ).sort((a,b) => (b.updated||0) - (a.updated||0));
+
+ const list = document.getElementById('wikiPageList');
+ if (!list) return;
+ if (!pages.length) {
+ list.innerHTML = `<div style="padding:18px;color:var(--muted);font-size:0.8rem;text-align:center;">
+ ${q ? 'No pages found.' : 'Noch keine Wiki-Seiten.<br>Klicke auf + Newe Seite.'}</div>`;
+ return;
+ }
+ list.innerHTML = pages.map(p => {
+ const preview = (p.content||'').replace(/[#*`>_\[\]]/g,'').trim().slice(0,60) || '—';
+ const date = p.updated ? new Date(p.updated).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'}) : '';
+ return `<div class="wiki-page-item${p.id===wikiPageId?' active':''}" onclick="openWikiPage(${p.id})">
+ <div class="wiki-page-item-body">
+ <div class="wiki-page-item-title">${esc(p.title||'Untitled')}</div>
+ <div class="wiki-page-item-preview">${esc(preview)}</div>
+ ${p.tag?`<span class="wiki-page-item-tag">${esc(p.tag)}</span>`:''}
+ </div>
+ <div class="wiki-page-item-date">${date}</div>
+ </div>`;
+ }).join('');
+}
+
+/* ──Open page ── */
+function openWikiPage(id) {
+ wikiPageId = id;
+ renderWikiList();
+ renderWikiContent();
+}
+
+/* ── New page ── */
+function newWikiPage() {
+ const page = { id: Date.now(), title: '', tag: '', content: '# Neue Seite\n\n', updated: Date.now() };
+ getWiki().unshift(page);
+ saveWiki();
+ wikiPageId = page.id;
+ wikiMode = 'edit';
+ renderWikiList();
+ renderWikiContent();
+ setTimeout(() => { const t = document.getElementById('wikiTitleInput'); if(t){t.focus();t.select();} }, 80);
+}
+
+/* ── Delete page ── */
+function deleteWikiPage(id) {
+ if (!confirm('Delete wiki page?')) return;
+ const wiki = getWiki();
+ const idx = wiki.findIndex(p => p.id === id);
+ if (idx === -1) return;
+ wiki.splice(idx, 1);
+ saveWiki();
+ if (wikiPageId === id) { wikiPageId = wiki[0]?.id || null; }
+ renderWikiList();
+ renderWikiContent();
+}
+
+/* ── Render content area ── */
+function renderWikiContent() {
+ const area = document.getElementById('wikiContentArea');
+ if (!area) return;
+ if (!wikiPageId) {
+ area.innerHTML = `<div class="wiki-placeholder"><p>Select a page on the left or create a new one.</p></div>`;
+ return;
+ }
+ const page = getWiki().find(p => p.id === wikiPageId);
+ if (!page) { area.innerHTML = `<div class="wiki-placeholder"><p>Page not found.</p></div>`; return; }
+
+ const wordCount = (page.content||'').trim().split(/\s+/).filter(Boolean).length;
+ const charCount = (page.content||'').length;
+
+ area.innerHTML = `
+ <div class="wiki-content-toolbar">
+ <input type="text" id="wikiTitleInput" value="${esc(page.title)}" placeholder="Page title …"
+ oninput="updateWikiField('title',this.value)" style="font-size:1rem;font-weight:600;" />
+ <input type="text" class="wiki-tag-input" value="${esc(page.tag||'')}" placeholder="# Tag"
+ oninput="updateWikiField('tag',this.value)" list="wikiTagList" />
+ <datalist id="wikiTagList">${getWiki().filter(p=>p.tag).map(p=>`<option value="${esc(p.tag)}">`).join('')}</datalist>
+ <div class="wiki-format-btns" id="wikiFmtBtns" style="${wikiMode==='edit'?'':'display:none'}">
+ <button class="wiki-fmt-btn" onclick="wikiInsert('**','**')" title="Fett">B</button>
+ <button class="wiki-fmt-btn" onclick="wikiInsert('*','*')" title="Kursiv" style="font-style:italic">I</button>
+ <button class="wiki-fmt-btn" onclick="wikiInsert('\`','\`')" title="Code">{"<>"}</button>
+ <button class="wiki-fmt-btn" onclick="wikiInsertLine('## ')" title="Überschrift">H</button>
+ <button class="wiki-fmt-btn" onclick="wikiInsertLine('- ')" title="Liste">•</button>
+ <button class="wiki-fmt-btn" onclick="wikiInsertLine('- [ ] ')" title="Checkliste"></button>
+ <button class="wiki-fmt-btn" onclick="wikiInsertBlock('\`\`\`\n','\`\`\`')" title="Codeblock">{ }</button>
+ </div>
+ <div class="wiki-mode-btns">
+ <button class="wiki-mode-btn${wikiMode==='edit'?' active':''}" onclick="setWikiMode('edit')"> Edit</button>
+ <button class="wiki-mode-btn${wikiMode==='view'?' active':''}" onclick="setWikiMode('view')"> View</button>
+ </div>
+ <button class="icon-btn del" onclick="deleteWikiPage(${page.id})" title="Seite löschen">Del</button>
+ </div>
+ <div class="wiki-editor-wrap">
+ ${wikiMode === 'edit'
+ ? `<textarea class="wiki-textarea" id="wikiTextarea" spellcheck="true"
+ oninput="onWikiInput(this.value)"
+ onkeydown="wikiKeyDown(event)">${esc(page.content||'')}</textarea>`
+ : `<div class="wiki-rendered" id="wikiRendered">${renderMarkdown(page.content||'')}</div>`
+ }
+ </div>
+ <div class="wiki-status">
+ <span>${wordCount} words · ${charCount} characters</span>
+ <span id="wikiSaveStatus"> Saved</span>
+ </div>`;
+}
+
+function setWikiMode(mode) { wikiMode = mode; renderWikiContent(); }
+
+function updateWikiField(field, value) {
+ const page = getWiki().find(p => p.id === wikiPageId); if (!page) return;
+ page[field] = value; page.updated = Date.now();
+ scheduleSave();
+ if (field === 'title' || field === 'tag') renderWikiList();
+}
+
+function onWikiInput(value) {
+ const page = getWiki().find(p => p.id === wikiPageId); if (!page) return;
+ page.content = value; page.updated = Date.now();
+ showWikiSaveStatus('⏳ …');
+ scheduleSave();
+}
+
+function scheduleSave() {
+ clearTimeout(wikiSaveTimer);
+ wikiSaveTimer = setTimeout(() => { saveWiki(); renderWikiList(); showWikiSaveStatus(' Saved'); }, 800);
+}
+function showWikiSaveStatus(msg) { const el = document.getElementById('wikiSaveStatus'); if (el) el.textContent = msg; }
+
+/* ── Keyboard shortcuts in editor ── */
+function wikiKeyDown(event) {
+ if (event.key === 'Tab') { event.preventDefault(); wikiInsertAtCursor(' '); }
+ if ((event.ctrlKey||event.metaKey) && event.key === 's') { event.preventDefault(); saveWiki(); showWikiSaveStatus(' Saved'); }
+ if ((event.ctrlKey||event.metaKey) && event.key === 'b') { event.preventDefault(); wikiInsert('**','**'); }
+ if ((event.ctrlKey||event.metaKey) && event.key === 'i') { event.preventDefault(); wikiInsert('*','*'); }
+}
+
+/* ── Editor helpers ── */
+function wikiInsertAtCursor(text) {
+ const ta = document.getElementById('wikiTextarea'); if (!ta) return;
+ const s = ta.selectionStart, e = ta.selectionEnd;
+ ta.value = ta.value.slice(0,s) + text + ta.value.slice(e);
+ ta.selectionStart = ta.selectionEnd = s + text.length;
+ onWikiInput(ta.value);
+}
+function wikiInsert(before, after) {
+ const ta = document.getElementById('wikiTextarea'); if (!ta) return;
+ const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s,e);
+ ta.value = ta.value.slice(0,s) + before + sel + after + ta.value.slice(e);
+ ta.selectionStart = s + before.length; ta.selectionEnd = e + before.length;
+ ta.focus(); onWikiInput(ta.value);
+}
+function wikiInsertLine(prefix) {
+ const ta = document.getElementById('wikiTextarea'); if (!ta) return;
+ const s = ta.selectionStart, lineStart = ta.value.lastIndexOf('\n', s-1)+1;
+ ta.value = ta.value.slice(0,lineStart) + prefix + ta.value.slice(lineStart);
+ ta.selectionStart = ta.selectionEnd = s + prefix.length;
+ ta.focus(); onWikiInput(ta.value);
+}
+function wikiInsertBlock(before, after) {
+ const ta = document.getElementById('wikiTextarea'); if (!ta) return;
+ const s = ta.selectionStart, e = ta.selectionEnd, sel = ta.value.slice(s,e);
+ const ins = before + sel + after;
+ ta.value = ta.value.slice(0,s) + ins + ta.value.slice(e);
+ ta.selectionStart = s + before.length; ta.selectionEnd = s + before.length + sel.length;
+ ta.focus(); onWikiInput(ta.value);
+}
+
+/* ── Markdown renderer ── */
+function renderMarkdown(md) {
+ let html = esc(md);
+ // Code blocks
+ html = html.replace(/```([\s\S]*?)```/g, (_, code) =>
+ `<pre><button class="wiki-copy" onclick="copyWikiCode(this)">copy</button><code>${code.trim()}</code></pre>`);
+ // Inline code
+ html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+ // Headings
+ html = html.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+ html = html.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+ html = html.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+ // HR
+ html = html.replace(/^---+$/gm, '<hr>');
+ // Bold / Italic
+ html = html.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+ html = html.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+ // Blockquote
+ html = html.replace(/^&gt; (.+)$/gm, '<blockquote>$1</blockquote>');
+ // Checkbox lists
+ html = html.replace(/^- \[ \] (.+)$/gm, '<div class="wiki-check"><input type="checkbox" disabled/><span>$1</span></div>');
+ html = html.replace(/^- \[x\] (.+)$/gm, '<div class="wiki-check"><input type="checkbox" checked disabled/><span>$1</span></div>');
+ // Unordered lists
+ html = html.replace(/((?:^- .+\n?)+)/gm, m =>
+ '<ul>' + m.replace(/^- (.+)$/gm,'<li>$1</li>') + '</ul>');
+ // Ordered lists
+ html = html.replace(/((?:^\d+\. .+\n?)+)/gm, m =>
+ '<ol>' + m.replace(/^\d+\. (.+)$/gm,'<li>$1</li>') + '</ol>');
+ // Tables
+ html = html.replace(/((?:^\|.+\|\n?)+)/gm, m => {
+ const rows = m.trim().split('\n').filter(r => !/^\|[-| :]+\|$/.test(r.trim()));
+ if (rows.length < 1) return m;
+ const header = rows[0].split('|').filter((_,i,a)=>i>0&&i<a.length-1).map(c=>`<th>${c.trim()}</th>`).join('');
+ const body = rows.slice(1).map(r=>'<tr>'+r.split('|').filter((_,i,a)=>i>0&&i<a.length-1).map(c=>`<td>${c.trim()}</td>`).join('')+'</tr>').join('');
+ return `<table><tr>${header}</tr>${body}</table>`;
+ });
+ // Links
+ html = html.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+ // Paragraphs (double newline)
+ html = html.replace(/\n\n/g, '</p><p>');
+ html = html.replace(/\n/g, '<br>');
+ html = '<p>' + html + '</p>';
+ // Clean up empty tags
+ html = html.replace(/<p>(<(?:h[1-3]|ul|ol|pre|blockquote|table|hr|div)[^>]*>)/g, '$1');
+ html = html.replace(/(<\/(?:h[1-3]|ul|ol|pre|blockquote|table|hr|div)>)<\/p>/g, '$1');
+ html = html.replace(/<p><\/p>/g, '');
+ return html;
+}
+
+function copyWikiCode(btn) {
+ const code = btn.nextElementSibling?.textContent || '';
+ navigator.clipboard.writeText(code).then(() => {
+ btn.textContent = ' ok';
+ setTimeout(() => btn.textContent = 'copy', 1500);
+ });
+}
+
+function copyPs(btn,id) { const e=getEntries().find(x=>x.id===id); if(!e?.ps)return; navigator.clipboard.writeText(e.ps).then(()=>{btn.textContent=' ok';btn.classList.add('copied');setTimeout(()=>{btn.textContent='copy';btn.classList.remove('copied');},1500);}); }
+function copyTodoPs(btn,itemId,secId) { const item=getTodos().find(x=>x.id===secId)?.items.find(x=>x.id===itemId); if(!item?.ps)return; navigator.clipboard.writeText(item.ps).then(()=>{btn.textContent=' ok';btn.classList.add('copied');setTimeout(()=>{btn.textContent='copy';btn.classList.remove('copied');},1500);}); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape'){ closeModal(); closeTodoItemModal(); closeTodoSecModal(); closeFileModal(); closeScriptModal(); closeLinkModal(); closeGlobalSearch(); closeTagsManager(); closeTemplates(); closeQR(); closePbSettings(); }
+ if(e.key==='Enter'&&e.ctrlKey){
+ if(document.getElementById('overlay').classList.contains('open')) saveEntry();
+ if(document.getElementById('todoItemOverlay').classList.contains('open')) saveTodoItem();
+ if(document.getElementById('todoSecOverlay').classList.contains('open')) saveTodoSection();
+ }
+});
+
+initPocketBase();
+</script>
+</body>
+</html>
